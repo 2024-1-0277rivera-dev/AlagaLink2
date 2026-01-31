@@ -1,0 +1,122 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AlagaLink - La Trinidad PWD/CWD System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              'alaga-blue': '#2546F0',
+              'alaga-gold': '#FFD43B',
+              'alaga-teal': '#00BF7D',
+              'alaga-navy': '#1A1A40',
+              'alaga-charcoal': '#2E2E2E',
+              'alaga-gray': '#F5F5F5',
+            },
+            animation: {
+              'shimmer': 'shimmer 3s linear infinite',
+              'shimmer-fast': 'shimmer 1.5s linear infinite',
+              'float': 'float 6s ease-in-out infinite',
+            },
+            keyframes: {
+              shimmer: {
+                '0%': { transform: 'translateX(-100%)' },
+                '100%': { transform: 'translateX(100%)' },
+              },
+              float: {
+                '0%, 100%': { transform: 'translateY(0)' },
+                '50%': { transform: 'translateY(-10px)' },
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap');
+      body { font-family: 'Inter', sans-serif; }
+      
+      /* Inflated 3D Design Utilities */
+      .inflated-card {
+        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08), 0 4px 15px -5px rgba(0, 0, 0, 0.04);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+      @media (min-width: 768px) {
+        .inflated-card {
+          box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1), 0 10px 20px -5px rgba(0, 0, 0, 0.04);
+        }
+      }
+      .dark .inflated-card {
+        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+      }
+      .inflated-card:hover {
+        transform: translateY(-4px) scale(1.005);
+      }
+      @media (min-width: 768px) {
+        .inflated-card:hover {
+          transform: translateY(-8px) scale(1.01);
+          box-shadow: 0 30px 60px -12px rgba(37, 70, 240, 0.25);
+        }
+      }
+
+      .glow-icon {
+        filter: drop-shadow(0 0 8px rgba(37, 70, 240, 0.4));
+      }
+      .glow-icon-gold {
+        filter: drop-shadow(0 0 8px rgba(255, 212, 59, 0.5));
+      }
+      
+      .text-3d {
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        letter-spacing: -0.02em;
+      }
+      @media (min-width: 768px) {
+        .text-3d { text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
+      }
+      .text-3d-heavy {
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      @media (min-width: 768px) {
+        .text-3d-heavy { text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); }
+      }
+
+      .inner-glow {
+        box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.2);
+      }
+
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      
+      /* 3D Flip Utilities */
+      .perspective-1000 { perspective: 1000px; }
+      .preserve-3d { transform-style: preserve-3d; }
+      .backface-hidden { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+      .rotate-y-180 { transform: rotateY(180deg); }
+
+      /* Smooth transitions for theme switching */
+      * { transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "@google/genai": "https://esm.sh/@google/genai@^1.35.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body class="bg-white dark:bg-alaga-navy text-gray-900 dark:text-white transition-colors duration-300">
+    <div id="root"></div>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>

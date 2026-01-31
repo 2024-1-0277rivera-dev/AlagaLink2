@@ -1,0 +1,7 @@
+{
+  "name": "AlagaLink - La Trinidad PWD/CWD Information System",
+  "description": "A comprehensive information system for Persons with Disabilities (PWD) and Children with Special Needs (CWD) in the Municipality of La Trinidad, providing profiling, programs management, and a lost & found portal.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
