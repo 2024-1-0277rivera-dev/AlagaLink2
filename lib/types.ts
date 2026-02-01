@@ -191,6 +191,7 @@ export interface LivelihoodProgram {
   venue: string;
   category: string;
   photoUrl?: string;
+  photoAlt?: string;
   isVisible?: boolean;
 }
 

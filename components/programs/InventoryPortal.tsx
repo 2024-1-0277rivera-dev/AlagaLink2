@@ -309,16 +309,8 @@ const InventoryCard: React.FC<InventoryCardProps> = ({ item, type, onApply, requ
 };
 
 const InventoryPortalOld = () => {
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-in zoom-in-95 duration-500">
-      {[].map(item => (
-        <div key={item.id} className="bg-white dark:bg-alaga-charcoal rounded-[24px] overflow-hidden border border-gray-100 dark:border-white/5 group hover:border-alaga-blue transition-all flex flex-col shadow-sm">
-          <div className="h-48 bg-alaga-gray dark:bg-black/20 overflow-hidden relative"><img src={item.photoUrl} className="absolute inset-0 w-full h-full object-cover blur-lg opacity-30 scale-110" alt="" /><img src={item.photoUrl} className="relative w-full h-full object-cover group-hover:scale-105 transition-all duration-700 will-change-transform" alt="" /><div className="absolute top-4 left-4 bg-alaga-navy/60 backdrop-blur-md px-3 py-1 rounded-full text-[9px] font-black text-white uppercase tracking-widest z-10">{item.category}</div><div className="absolute inset-0 shadow-[inset_0_0_40px_rgba(0,0,0,0.05)] pointer-events-none"></div></div>
-          <div className="p-6 flex flex-col flex-1"><h4 className="text-lg font-black mb-1.5 truncate">{item.name || item.title}</h4><p className="text-[11px] opacity-60 mb-5 line-clamp-2 leading-relaxed flex-1 font-medium">{item.overview || item.description}</p><div className="mb-5 space-y-1.5"><div className="flex items-center gap-2 text-[9px] font-bold opacity-50"><i className="fa-solid fa-calendar text-alaga-blue"></i> {item.schedule}</div><div className="flex items-center gap-2 text-[9px] font-bold opacity-50"><i className="fa-solid fa-location-dot text-alaga-blue"></i> {item.venue || 'Municipal Office'}</div></div><button onClick={() => onApply(type, item.name || item.title, item.id)} className={`w-full py-3.5 rounded-2xl font-black text-sm transition-all ${item.stockCount === 0 ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : `bg-alaga-blue text-white shadow-xl hover:scale-[1.02]`}`}>{item.stockCount === 0 ? 'Out of Stock' : `Request ${type === 'Device' ? 'Aid' : 'Program'}`}</button></div>
-        </div>
-      ))}
-    </div>
-  );
+  // Legacy view retained for reference – intentionally returns null in production builds.
+  return null;
 };
 
 export default InventoryPortal;
