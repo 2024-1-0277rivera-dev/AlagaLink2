@@ -4,7 +4,7 @@ import { DisabilityCategory } from '../../types';
 import RegistrationWorkflow from '../members/RegistrationWorkflow';
 
 const LandingPage: React.FC = () => {
-  const { login, loginWithPassword, users, addUser, loginById, addProgramRequest, searchSignal, setSearchSignal, notifications } = useAppContext();
+  const { currentUser, login, loginWithPassword, users, addUser, loginById, addProgramRequest, searchSignal, setSearchSignal, notifications } = useAppContext();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showSignupPopover, setShowSignupPopover] = useState(false);

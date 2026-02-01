@@ -58,7 +58,7 @@ export default function Page() {
 
   return (
     <>
-      <Navbar onNavigate={setCurrentPage} />
+      <Navbar onNavigate={setCurrentPage} currentPage={currentPage} />
       <RoleSwitcherModal />
       <main className="min-h-[calc(100vh-80px)]">
         {renderPage()}
