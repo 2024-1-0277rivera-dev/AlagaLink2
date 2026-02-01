@@ -244,7 +244,7 @@ const InventoryPortal: React.FC<InventoryPortalProps> = ({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-in zoom-in-95 duration-500">
       {items.filter(i => i.isVisible).map(item => (
-        <InventoryCard key={item.id} item={item} type={type} onApply={onApply} />
+        <InventoryCard key={item.id} item={item} type={type} onApply={onApply} requests={requests} notifications={notifications} />
       ))}
     </div>
   );
@@ -254,10 +254,13 @@ interface InventoryCardProps {
   item: any;
   type: 'Device' | 'Medical' | 'Livelihood';
   onApply: (type: string, title: string, itemId: string) => void;
+  requests: ProgramAvailment[];
+  notifications: any[];
 }
 
-const InventoryCard: React.FC<InventoryCardProps> = ({ item, type, onApply }) => {
+const InventoryCard: React.FC<InventoryCardProps> = ({ item, type, onApply, requests, notifications }) => {
   const [imageError, setImageError] = useState(false);
+  const unreadRequestsForItem = requests.filter(r => r.programType === type && r.requestedItemId === item.id && notifications.some(n => n.link && n.link.endsWith(r.id) && !n.isRead)).length;
 
   return (
     <div className="bg-white dark:bg-alaga-charcoal rounded-[24px] overflow-hidden border border-gray-100 dark:border-white/5 group hover:border-alaga-blue transition-all flex flex-col shadow-sm">
