@@ -8,7 +8,7 @@ import { UserProfile } from '@/lib/types';
 import { OFFICE_ID } from '../constants';
 
 const FloatingAssistiveButton: React.FC = () => {
-  const { currentUser, users } = useAppContext();
+  const { currentUser, users, directMessages } = useAppContext();
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isOpen, setIsOpen] = useState(false);
   const [isDragging, setIsDragging] = useState(false);

@@ -52,6 +52,9 @@ export interface DirectMessage {
   senderId: string;
   text: string;
   timestamp: string;
+  meta?: {
+    viaOffice?: boolean;
+  };
 }
 
 export interface UserProfile {
