@@ -1,4 +1,6 @@
 
+'use client';
+
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useAppContext } from '../context/AppContext';
 import NotificationPopover from './notifications/NotificationPopover';
