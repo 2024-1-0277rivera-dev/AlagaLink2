@@ -212,8 +212,8 @@ const InventoryPortal: React.FC<InventoryPortalProps> = ({
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
                         <div className="md:col-span-1 space-y-6">
                           <div className="w-full aspect-square bg-alaga-gray dark:bg-black/40 rounded-[20px] shadow-2xl overflow-hidden relative">
-                            <FallbackImage src={item.photoUrl} className="absolute inset-0 w-full h-full object-cover blur-xl opacity-20 scale-125" alt={item.photoAlt || item.name || item.title} fallbackType={type} />
-                            <FallbackImage src={item.photoUrl} className="relative w-full h-full object-contain p-6" alt={item.photoAlt || item.name || item.title} fallbackType={type} />
+                            <FallbackImage src={item.photoUrl} className="absolute inset-0 w-full h-full object-cover blur-xl opacity-20 scale-125" alt={(item as any).photoAlt || item.name || item.title} fallbackType={type} />
+                            <FallbackImage src={item.photoUrl} className="relative w-full h-full object-contain p-6" alt={(item as any).photoAlt || item.name || item.title} fallbackType={type} />
                           </div>
                           <div className="p-6 bg-alaga-gray dark:bg-alaga-navy/20 rounded-[20px] space-y-4 border border-gray-100 dark:border-white/5">
                             <div><p className="text-[9px] font-black uppercase opacity-40 mb-1 tracking-widest">Schedule</p><p className="font-bold text-sm">{item.schedule}</p></div>
