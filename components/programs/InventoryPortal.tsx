@@ -199,7 +199,7 @@ const InventoryPortal: React.FC<InventoryPortalProps> = ({
               {(() => {
                 const item = selectedLivelihood || selectedMedical || selectedDevice;
                 if (!item) return null;
-                const title = item.title || item.name;
+                const title = (item as any).title || (item as any).name;
                 const overview = item.overview || (item as any).description;
                 const skillLabel = type === 'Medical' ? 'Requirements & Focus' : type === 'Device' ? 'Eligibility & Requirements' : 'Skill Set Gained';
                 return (
