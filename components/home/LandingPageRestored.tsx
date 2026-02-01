@@ -144,6 +144,21 @@ const LandingPage: React.FC = () => {
         </div>
       </section>
 
+      <section id="community-vigil" ref={missingRef} className="py-20 px-6 bg-transparent">
+        <div className="max-w-7xl mx-auto">
+          <div className="mb-8">
+            <div className="w-12 h-12 bg-red-500/10 text-red-500 rounded-2xl flex items-center justify-center text-2xl mb-4">
+              <i className="fa-solid fa-person-circle-question"></i>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-black">Community Vigilance</h2>
+            <p className="text-xs font-black uppercase tracking-[0.3em] opacity-30">Lost & Found Recovery System</p>
+            <p className="text-sm opacity-60 mt-3">Our community-driven missing & found registry highlights urgent cases and recent recoveries.</p>
+          </div>
+
+          <CommunityVigilCarousel />
+        </div>
+      </section>
+
       <section id="programs" ref={programsRef} className="py-32 px-6 bg-alaga-gray dark:bg-alaga-navy/40 relative">
         <div className="max-w-7xl mx-auto space-y-20">
           <div className="text-center space-y-4">
@@ -247,36 +262,7 @@ const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      <section id="community-vigil" ref={missingRef} className="py-32 px-6">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 items-center gap-20">
-          <div className="space-y-8">
-            <div className="space-y-4">
-              <div className="w-16 h-16 bg-red-500/10 text-red-500 rounded-2xl flex items-center justify-center text-3xl">
-                <i className="fa-solid fa-person-circle-question"></i>
-              </div>
-              <h2 className="text-4xl md:text-6xl font-black text-3d-heavy">Community Vigilance</h2>
-              <p className="text-sm font-black uppercase tracking-[0.3em] opacity-30">Lost & Found Recovery System</p>
-            </div>
-            <p className="text-lg font-medium opacity-60 leading-relaxed">Our advanced community alert system links registry data to rapid incident reporting, helping PDAO and MSWDO coordinate faster recovery for missing persons.</p>
-            <ul className="space-y-4">
-              {['Direct Registry Integration', 'Real-time Social Dissemination', 'Verified Reporting Channels'].map((item, i) => (
-                <li key={i} className="flex items-center gap-4 font-black text-sm"><i className="fa-solid fa-circle-check text-alaga-teal"></i> {item}</li>
-              ))}
-            </ul>
-            <button onClick={() => scrollTo(joinRef)} className="px-10 py-5 border-2 border-red-500 text-red-500 rounded-[24px] font-black text-sm uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all shadow-xl">Explore Safety Portal</button>
-          </div>
 
-          <div className="relative group perspective-1000">
-            <div className="absolute inset-0 bg-red-500/10 rounded-[32px] blur-3xl group-hover:bg-red-500/20 transition-all"></div>
-            <div className="relative">
-              {/* Replaced static card with interactive community vigil carousel */}
-              <div className="p-0">
-                <CommunityVigilCarousel />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       <section id="login" ref={joinRef} className="py-32 px-6 bg-alaga-blue text-white relative overflow-hidden">
         <div className="absolute top-0 right-0 p-20 opacity-10 rotate-12"><i className="fa-solid fa-id-card-clip text-[400px]"></i></div>
