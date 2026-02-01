@@ -267,16 +267,10 @@ const LandingPage: React.FC = () => {
 
           <div className="relative group perspective-1000">
             <div className="absolute inset-0 bg-red-500/10 rounded-[32px] blur-3xl group-hover:bg-red-500/20 transition-all"></div>
-            <div className="relative bg-white dark:bg-alaga-charcoal p-8 rounded-[32px] border-2 border-white dark:border-white/5 shadow-xl inflated-card">
-              <div className="relative w-full h-64 rounded-[24px] overflow-hidden mb-6 bg-gradient-to-br from-red-500/10 to-red-500/5">
-                <img src="/images/lost-found/community-safety.svg" alt="Community safety and alert" className="w-full h-full object-cover" />
-              </div>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <h4 className="text-xl font-black">Search: Active Alerts</h4>
-                  <span className="px-2 py-1 bg-red-500 text-white rounded-full text-[8px] font-black uppercase animate-pulse">Live Tracking</span>
-                </div>
-                <p className="opacity-40 text-xs font-bold">Public safety is an integrated community responsibility.</p>
+            <div className="relative">
+              {/* Replaced static card with interactive community vigil carousel */}
+              <div className="p-0">
+                <CommunityVigilCarousel />
               </div>
             </div>
           </div>
