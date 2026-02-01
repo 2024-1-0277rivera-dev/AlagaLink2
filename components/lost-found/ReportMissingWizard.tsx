@@ -1,4 +1,5 @@
 
+'use client';
 import React, { useState, useMemo } from 'react';
 import { useAppContext } from '../../context/AppContext';
 import { UserProfile, LostReport } from '../../types';
