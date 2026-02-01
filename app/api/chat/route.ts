@@ -12,9 +12,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const apiKey = process.env.NEXT_PUBLIC_GROQ_API_KEY || process.env.GROQ_API_KEY;
+    // Prefer server-side secret; fallback to public key only for local testing if explicitly set.
+    const apiKey = process.env.GROQ_API_KEY || process.env.NEXT_PUBLIC_GROQ_API_KEY;
     if (!apiKey) {
-      console.error('Groq API key not configured');
+      console.error('Groq API key not configured (set GROQ_API_KEY in .env.local)');
       return NextResponse.json(
         { error: 'API key not configured' },
         { status: 500 }

@@ -14,6 +14,7 @@ import { DEVELOPERS, CONTRIBUTORS } from '@/lib/constants';
 
 export default function Page() {
   const [currentPage, setCurrentPage] = useState('home');
+  const { currentUser } = useAppContext();
 
   const renderPage = () => {
     switch(currentPage) {
@@ -62,7 +63,7 @@ export default function Page() {
       <main className="min-h-[calc(100vh-80px)]">
         {renderPage()}
       </main>
-      <FloatingAssistiveButton />
+      {currentUser && currentPage !== 'home' && <FloatingAssistiveButton />}
     </>
   );
 }
