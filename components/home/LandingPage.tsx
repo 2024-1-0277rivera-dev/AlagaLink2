@@ -19,7 +19,7 @@ const LandingPage: React.FC = () => {
   const joinRef = useRef<HTMLDivElement>(null);
   const [aboutService, setAboutService] = useState<{ title: string; description: string } | null>(null);
 
-  const scrollTo = (ref: React.RefObject<HTMLDivElement>) => {
+  const scrollTo = (ref: React.RefObject<HTMLDivElement | null>) => {
     ref.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
@@ -70,6 +70,22 @@ const LandingPage: React.FC = () => {
     }
   }, [searchSignal, setSearchSignal]);
 
+  // deferred: handle apply after `applyTarget` and `selectedService` are declared below
+  // (effect will be inserted after state declarations to avoid 'used before declaration' errors)
+
+
+  const highlights = [
+    { title: 'Inclusive Registry', icon: 'fa-users-viewfinder', color: 'text-alaga-blue', ref: joinRef, desc: 'Digital profiling for PWD/CWD families.' },
+    { title: 'Municipal Aid', icon: 'fa-hand-holding-medical', color: 'text-alaga-teal', ref: programsRef, desc: 'Direct access to medicine & devices.' },
+    { title: 'Rapid Recovery', icon: 'fa-person-circle-question', color: 'text-red-500', ref: missingRef, desc: 'Community alert system for safety.' }
+  ];
+  // Services catalog for landing page preview
+  const { MOCK_DEVICES, MOCK_MEDICAL, MOCK_LIVELIHOODS } = require('../../mockData/index');
+  const [selectedService, setSelectedService] = React.useState<{ id: string; title: string; desc: string } | null>(null);
+  const [showServicePopover, setShowServicePopover] = React.useState(false);
+  const [showApplyPopover, setShowApplyPopover] = React.useState(false);
+  const [applyTarget, setApplyTarget] = React.useState<any>(null);
+
   // If the user was attempting to apply while logged out, complete the request after they log in
   React.useEffect(() => {
     if (!currentUser || !applyTarget) return;
@@ -108,18 +124,6 @@ const LandingPage: React.FC = () => {
     setShowServicePopover(false);
     setApplyTarget(null);
   }, [currentUser, applyTarget, selectedService]);
-
-  const highlights = [
-    { title: 'Inclusive Registry', icon: 'fa-users-viewfinder', color: 'text-alaga-blue', ref: joinRef, desc: 'Digital profiling for PWD/CWD families.' },
-    { title: 'Municipal Aid', icon: 'fa-hand-holding-medical', color: 'text-alaga-teal', ref: programsRef, desc: 'Direct access to medicine & devices.' },
-    { title: 'Rapid Recovery', icon: 'fa-person-circle-question', color: 'text-red-500', ref: missingRef, desc: 'Community alert system for safety.' }
-  ];
-  // Services catalog for landing page preview
-  const { MOCK_DEVICES, MOCK_MEDICAL, MOCK_LIVELIHOODS } = require('../../mockData/index');
-  const [selectedService, setSelectedService] = React.useState<{ id: string; title: string; desc: string } | null>(null);
-  const [showServicePopover, setShowServicePopover] = React.useState(false);
-  const [showApplyPopover, setShowApplyPopover] = React.useState(false);
-  const [applyTarget, setApplyTarget] = React.useState<any>(null);
 
   const openService = (id: string, title: string, desc: string) => {
     setSelectedService({ id, title, desc });
