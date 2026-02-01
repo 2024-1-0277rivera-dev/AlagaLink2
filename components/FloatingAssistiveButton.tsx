@@ -137,7 +137,7 @@ const FloatingAssistiveButton: React.FC = () => {
       <div 
         ref={buttonRef}
         style={{ left: `${position.x}px`, top: `${position.y}px` }}
-        className={`fixed z-[160] select-none transition-transform duration-300 ${isDragging ? 'scale-110 cursor-grabbing' : 'cursor-grab'}`}
+        className={`fixed ${isOpen || showAdminHub ? 'z-[210]' : 'z-[160]'} select-none transition-transform duration-300 ${isDragging ? 'scale-110 cursor-grabbing' : 'cursor-grab'}`}
       >
         <div className="relative group">
           {!isOpen && !showAdminHub && !isDragging && (
@@ -153,9 +153,12 @@ const FloatingAssistiveButton: React.FC = () => {
           <div 
             onMouseDown={handleMouseDown}
             onClick={toggleAction}
+            title={isOpen || showAdminHub ? 'Close chat' : (isAdmin ? 'Open inbox' : 'Open chat')}
+            aria-pressed={isOpen || showAdminHub}
+            aria-label={isOpen || showAdminHub ? 'Close chat' : (isAdmin ? 'Open inbox' : 'Open chat')}
             className={`w-16 h-16 rounded-full flex items-center justify-center text-white transition-all duration-500 shadow-[0_10px_40px_rgba(37,70,240,0.5)] border-4 border-white/30 relative overflow-hidden active:scale-90
               ${(isOpen || showAdminHub)
-                ? 'bg-red-500 shadow-red-500/50 rotate-90 scale-90' 
+                ? 'bg-red-500 shadow-red-500/50 scale-90' 
                 : 'bg-alaga-blue hover:scale-105 hover:rotate-6'
               }
             `}
