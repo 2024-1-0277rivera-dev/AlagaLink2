@@ -47,7 +47,8 @@ FORMATTING RULES:
         { role: 'system', content: systemPrompt },
         { role: 'user', content: message },
       ],
-      model: 'mixtral-8x7b-32768',
+      // Allow overriding the model via env for quick migration if needed
+      model: process.env.GROQ_MODEL || 'groq/compound',
       max_tokens: 1024,
     });
 
