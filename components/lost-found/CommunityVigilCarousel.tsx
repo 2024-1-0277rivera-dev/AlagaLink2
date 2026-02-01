@@ -27,43 +27,53 @@ const CommunityVigilCarousel: React.FC = () => {
 
   return (
     <div className="w-full p-0 bg-transparent">
-      <div className="w-full h-[420px] mb-6 relative overflow-hidden">
+      <div className="w-full h-[460px] mb-6 relative overflow-hidden">
         {/* Missing person large highlight: left image, right details (slide + fade) */}
         {missing.map((m, i) => {
           const visible = i === index;
           const hours = calcHoursMissing(m.timeMissing);
-          const isUrgent = hours >= 24;
+          const isUrgent = hours >= 72 ? 'red' : hours >= 24 ? 'red' : hours >= 6 ? 'amber' : 'blue';
+
+          const urgencyClasses = isUrgent === 'red' ? 'bg-red-600 text-white' : isUrgent === 'amber' ? 'bg-amber-500 text-white' : 'bg-alaga-blue text-white';
 
           return (
             <div
               key={m.id}
-              className={`absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out transform-gpu ${visible ? 'opacity-100 z-20' : 'opacity-0 z-10'} flex items-center`}
+              className={`absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out transform-gpu ${visible ? 'opacity-100 z-20' : 'opacity-0 z-10'} flex items-stretch gap-6`}
               aria-hidden={!visible}
             >
-              {/* Left: Full-length image */}
-              <button onClick={() => setSelected(m)} className={`w-3/5 h-full overflow-hidden rounded-[12px] ${visible ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'} transition-transform duration-700 ease-in-out`} aria-label={`View photo of ${m.name}`}>
-                <img src={m.photoUrl || `https://picsum.photos/seed/${m.id}/1200/1600`} alt={m.name} className="w-full h-full object-cover rounded-[12px]" />
-              </button>
+              {/* LEFT: Image (appears first with fade-in from left) */}
+              <div className={`w-3/5 h-full overflow-hidden rounded-[15px] relative ${visible ? 'translate-x-0 opacity-100' : '-translate-x-8 opacity-0'} transition-all duration-700 ease-out`}
+                   onClick={() => setSelected(m)} aria-label={`View photo of ${m.name}`}>
+                <img src={m.photoUrl || `https://picsum.photos/seed/${m.id}/1200/1800`} alt={m.name} className="w-full h-full object-cover object-center filter brightness-[1.03] contrast-[1.02]" />
 
-              {/* Right: Sliding details */}
-              <div className="w-2/5 h-full pl-6 pr-2">
-                <div className={`h-full flex flex-col justify-between transition-transform duration-700 ease-in-out ${visible ? 'translate-x-0 opacity-100' : 'translate-x-6 opacity-0'}`}>
-                  <div>
-                    <h3 className="text-3xl font-black mb-2 text-center md:text-left text-alaga-navy dark:text-white">{m.name}</h3>
-                    <p className="text-sm opacity-70 mb-2"><span className="font-black">Last seen:</span> {m.lastSeen}</p>
-                    <p className="text-sm opacity-70 mb-2"><span className="font-black">Disability:</span> {m.description}</p>
-                    <p className="text-sm opacity-70 mb-2"><span className="font-black">Address:</span> {m.lastSeen}</p>
-                    <div className="mt-4">
-                      <span className={`px-3 py-1 rounded-full text-[12px] font-black uppercase tracking-widest ${isUrgent ? 'bg-red-500 text-white' : 'bg-alaga-blue text-white'}`}>
-                        {isUrgent ? 'URGENT' : `${Math.max(1, hours)}h Missing`}
-                      </span>
+                {/* Blue gradient flowing from right to left to give imaginary separation */}
+                <div className="pointer-events-none absolute inset-y-0 right-0 w-1/3 bg-gradient-to-l from-blue-700/40 to-transparent"></div>
+
+                {/* Urgency badge on image */}
+                <div className="absolute top-4 left-4 z-30">
+                  <div className={`px-3 py-1 rounded-full text-[12px] font-black uppercase tracking-widest ${urgencyClasses}`}>{isUrgent === 'red' ? 'URGENT' : `${Math.max(1, hours)}h Missing`}</div>
+                </div>
+              </div>
+
+              {/* RIGHT: Details (slides in from left) */}
+              <div className="w-2/5 h-full pr-2 flex items-center">
+                <div className={`w-full h-full bg-white dark:bg-alaga-charcoal p-6 rounded-[12px] shadow-lg transform ${visible ? 'translate-x-0 opacity-100' : 'translate-x-6 opacity-0'} transition-all duration-700 ease-out`} onClick={() => setSelected(m)}>
+                  <h3 className="text-4xl font-extrabold leading-tight mb-2 text-alaga-navy dark:text-white">{m.name}</h3>
+                  <p className="text-sm opacity-70 mb-2"><span className="font-black">Last seen:</span> <span className="font-semibold">{m.lastSeen}</span></p>
+                  <p className="text-sm opacity-70 mb-2"><span className="font-black">Disability:</span> <span className="font-semibold">{m.description}</span></p>
+                  <p className="text-sm opacity-70 mb-2"><span className="font-black">Address:</span> <span className="font-semibold">{m.lastSeen}</span></p>
+
+                  <div className="mt-6 flex items-center gap-4">
+                    <div className="text-xs font-black uppercase opacity-80">Status</div>
+                    <div className="flex-1">
+                      <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+                        <div className={`h-2 rounded-full ${isUrgent === 'red' ? 'bg-red-600 w-full' : isUrgent === 'amber' ? 'bg-amber-500 w-2/3' : 'bg-alaga-blue w-1/3'}`} />
+                      </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 mt-6">
-                    <button onClick={() => setSelected(m)} className="px-4 py-3 bg-alaga-blue text-white rounded-lg font-black">View Full Profile</button>
-                    <button onClick={() => alert('Share functionality not implemented in mock')} className="px-3 py-3 border rounded-lg font-black text-sm">Share</button>
-                  </div>
+                  <div className="mt-6 text-sm opacity-80">Tap the image or details to view full profile and contact information.</div>
                 </div>
               </div>
             </div>
@@ -80,12 +90,15 @@ const CommunityVigilCarousel: React.FC = () => {
         )}
       </div>
 
-      {/* Found persons row (smaller tiles, multiple columns) */}
-      <div className="mt-4 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 items-start">
+      {/* Found persons row (improved tiles) */}
+      <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 items-start">
         {found.map(f => (
-          <button key={f.id} onClick={() => setSelected(f)} className="overflow-hidden rounded-[12px] group shadow-sm hover:shadow-md transition-shadow duration-200" aria-label={`View details for ${f.name}`}>
-            <img src={f.photoUrl || `https://picsum.photos/seed/${f.id}/400/600`} alt={f.name} className="w-full h-36 object-cover rounded-[12px]" />
-            <div className="p-2 text-xs text-center font-black truncate">{f.name}</div>
+          <button key={f.id} onClick={() => setSelected(f)} className="overflow-hidden rounded-[15px] group shadow-sm hover:shadow-md transition-shadow duration-200 relative" aria-label={`View details for ${f.name}`}>
+            <img src={f.photoUrl || `https://picsum.photos/seed/${f.id}/600/900`} alt={f.name} className="w-full h-40 object-cover object-center rounded-[15px]" />
+            <div className="absolute left-0 right-0 bottom-0 p-2 bg-gradient-to-t from-black/40 to-transparent rounded-bl-[15px] rounded-br-[15px]">
+              <div className="text-xs font-black text-white truncate">{f.name}</div>
+              <div className="text-[10px] text-white/80">{f.status}</div>
+            </div>
           </button>
         ))}
       </div>
