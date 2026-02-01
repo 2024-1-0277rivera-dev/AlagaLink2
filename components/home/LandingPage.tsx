@@ -220,25 +220,25 @@ const LandingPage: React.FC = () => {
 
       <section id="programs" ref={programsRef} className="py-32 px-6 bg-alaga-gray dark:bg-alaga-navy/40 relative">
         <div className="max-w-7xl mx-auto space-y-20">
-           <div className="text-center space-y-4">
+          <div className="text-center space-y-4">
             <h2 className="text-4xl md:text-6xl font-black text-3d">Programs & Services</h2>
-              <p className="text-xs font-black uppercase tracking-[0.3em] opacity-30">The Service Delivery Backbone</p>
-           </div>
+            <p className="text-xs font-black uppercase tracking-[0.3em] opacity-30">The Service Delivery Backbone</p>
+          </div>
 
           <div className="space-y-8">
 
             {/* Dashboard-style PWD ID Issuance (featured) */}
-            <div onClick={() => openService('id', 'PWD ID Issuance', 'Apply for an official PWD ID. You will need basic identification documents and proof of disability. Click Register to continue to login/registration.')} className="max-w-4xl mx-auto inflated-card bg-white dark:bg-alaga-charcoal rounded-[32px] p-12 md:p-14 relative grid md:grid-cols-4 gap-6 items-center cursor-pointer hover:scale-105 transition-all md:min-h-[260px]">
+            <div className="max-w-4xl mx-auto inflated-card bg-white dark:bg-alaga-charcoal rounded-[32px] p-14 md:p-16 relative grid md:grid-cols-4 gap-6 items-center cursor-pointer transition-transform duration-300 ease-out transform-gpu hover:scale-105 hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-alaga-blue/10 md:min-h-[320px]" onClick={() => openService('id', 'PWD ID Issuance', 'Apply for an official PWD ID. You will need basic identification documents and proof of disability. Click Register to continue to login/registration.') }>
               <div className="md:col-span-3 text-left">
-                <div className="inline-flex items-center gap-3 px-3 py-1 bg-alaga-blue/10 text-alaga-blue rounded-full mb-3">
-                  <i className="fa-solid fa-id-card-clip"></i>
-                  <span className="text-[10px] font-black uppercase tracking-widest">Official Identification</span>
+                <div className="inline-flex items-center gap-3 px-4 py-1.5 bg-alaga-blue/10 text-alaga-blue rounded-full mb-3">
+                  <i className="fa-solid fa-id-card-clip text-lg"></i>
+                  <span className="text-[11px] font-black uppercase tracking-widest">Official Identification</span>
                 </div>
-                <h3 className="text-4xl md:text-5xl font-black mb-2 text-3d-heavy tracking-tighter drop-shadow-lg animate-pulse">PWD ID Issuance</h3>
-                <p className="opacity-60 text-sm mb-4">Apply for your official PWD identification. This ID helps you access priority services and availments from the municipal offices.</p>
+                <h3 className="text-5xl md:text-6xl font-black mb-2 text-3d-heavy tracking-tighter drop-shadow-lg animate-pulse">PWD ID Issuance</h3>
+                <p className="opacity-70 text-sm md:text-base mb-4 leading-relaxed">Apply for your official PWD identification. This ID helps you access priority services and availments from the municipal offices.</p>
                 <div className="flex items-center gap-4">
-                  <button onClick={(e) => { e.stopPropagation(); openAbout('PWD ID Issuance', 'Apply for an official PWD ID. You will need basic identification documents and proof of disability. Click Register to continue to login/registration.'); }} className="px-8 py-3 bg-alaga-blue text-white rounded-[16px] font-black">About</button>
-                  <button onClick={(e) => { e.stopPropagation(); scrollTo(joinRef); }} className="px-8 py-3 border-2 border-alaga-blue text-alaga-blue rounded-[16px] font-black">Register Now</button>
+                  <button onClick={(e) => { e.stopPropagation(); openAbout('PWD ID Issuance', 'Apply for an official PWD ID. You will need basic identification documents and proof of disability. Click Register to continue to login/registration.'); }} className="px-6 py-3 bg-alaga-blue text-white rounded-xl font-black uppercase tracking-widest text-sm transition-transform duration-200 hover:scale-105 shadow-sm">About</button>
+                  <button onClick={(e) => { e.stopPropagation(); scrollTo(joinRef); }} className="px-6 py-3 border-2 border-alaga-blue text-alaga-blue rounded-xl font-black uppercase tracking-widest text-sm transition-transform duration-200 hover:scale-105">Register Now</button>
                 </div>
               </div>
               <div className="md:col-span-1 text-center">
@@ -252,7 +252,7 @@ const LandingPage: React.FC = () => {
             {/* Service cards: PhilHealth, Assistive Devices, Medical Services, Livelihood */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {/* PhilHealth Card */}
-              <div className="inflated-card bg-white dark:bg-alaga-charcoal rounded-[24px] overflow-hidden flex flex-col group hover:shadow-2xl transition-all h-full min-h-[260px] p-6">
+              <div className="inflated-card bg-white dark:bg-alaga-charcoal rounded-[24px] overflow-hidden flex flex-col group transition-transform duration-300 ease-out transform-gpu hover:scale-105 hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-alaga-gold/10 h-full min-h-[260px] p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <span className="text-alaga-gold text-[10px] font-black uppercase tracking-widest">Health & Benefits</span>
@@ -260,32 +260,32 @@ const LandingPage: React.FC = () => {
                   </div>
                   {philhealthNotif && <span className="w-3 h-3 bg-red-500 rounded-full" />}
                 </div>
-                <p className="opacity-60 text-xs mt-4 flex-1">Sponsored enrollment and assistance for PWD members to access government health insurance benefits.</p>
+                <p className="opacity-70 text-xs md:text-sm mt-4 flex-1 leading-relaxed">Sponsored enrollment and assistance for PWD members to access government health insurance benefits.</p>
                 <div className="mt-6 flex items-center gap-3">
-                  <button onClick={() => openService('philhealth', 'PhilHealth', 'Sponsored PhilHealth enrollment and benefit assistance for eligible PWD members.')} className="px-4 py-2 bg-alaga-gold text-alaga-navy rounded-xl font-black text-xs">Details</button>
-                  <button onClick={() => openAbout('PhilHealth', 'PhilHealth enrollment and benefits. Click Register to proceed to login/registration.')} className="px-4 py-2 border border-gray-200 rounded-xl text-xs">About</button>
+                  <button onClick={(e) => { e.stopPropagation(); openService('philhealth', 'PhilHealth', 'Sponsored PhilHealth enrollment and benefit assistance for eligible PWD members.'); }} className="px-4 py-2 bg-alaga-gold text-alaga-navy rounded-xl font-black uppercase tracking-widest text-xs transition-transform duration-200 hover:scale-105 shadow-sm">Details</button>
+                  <button onClick={(e) => { e.stopPropagation(); openAbout('PhilHealth', 'PhilHealth enrollment and benefits. Click Register to proceed to login/registration.'); }} className="px-4 py-2 border border-gray-200 rounded-xl text-xs uppercase tracking-widest">About</button>
                 </div>
               </div>
 
               {/* Assistive Devices Card */}
-              <div className="inflated-card bg-white dark:bg-alaga-charcoal rounded-[24px] overflow-hidden flex flex-col group hover:shadow-2xl transition-all h-full min-h-[260px]">
-                <div className="relative h-40 overflow-hidden cursor-pointer bg-gradient-to-br from-alaga-blue/10 to-alaga-blue/5">
-                  <img src="/images/programs/standard wheelchair.jpg" alt="Wheelchairs and assistive devices" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+              <div className="inflated-card bg-white dark:bg-alaga-charcoal rounded-[24px] overflow-hidden flex flex-col group transition-transform duration-300 ease-out transform-gpu hover:scale-105 hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-alaga-blue/10 h-full min-h-[260px] p-0">
+                <div className="relative h-44 overflow-hidden cursor-pointer bg-gradient-to-br from-alaga-blue/10 to-alaga-blue/5">
+                  <img src="/images/programs/standard wheelchair.jpg" alt="Wheelchairs and assistive devices" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 rounded-t-lg" />
                 </div>
                 <div className="p-6 space-y-3 flex flex-col flex-1">
                   <span className="text-alaga-blue text-[10px] font-black uppercase tracking-widest">Inventory Support</span>
                   <h3 className="text-2xl font-black">Assistive Devices</h3>
-                  {assistiveNotif && <span className="absolute top-4 right-4 w-3 h-3 bg-red-500 rounded-full shadow-md" />}
-                  <p className="opacity-60 text-xs font-medium leading-relaxed flex-1">Request wheelchairs, hearing aids, and mobility tools directly through your verified digital identity.</p>
+                  {assistiveNotif && <span className="absolute top-6 right-6 w-3 h-3 bg-red-500 rounded-full shadow-md" />}
+                  <p className="opacity-70 text-xs md:text-sm font-medium leading-relaxed flex-1">Request wheelchairs, hearing aids, and mobility tools directly through your verified digital identity.</p>
                   <div className="mt-4 flex items-center gap-3">
-                    <button onClick={() => openService('devices', 'Assistive Devices', 'Request wheelchairs, hearing aids, and mobility tools.')} className="px-4 py-2 bg-alaga-blue text-white rounded-xl font-black text-xs">Details</button>
-                    <button onClick={() => openAbout('Assistive Devices', 'Request wheelchairs, hearing aids, and mobility tools. Click Request in the details to proceed to login.')} className="px-4 py-2 border border-gray-200 rounded-xl text-xs">About</button>
+                    <button onClick={(e) => { e.stopPropagation(); openService('devices', 'Assistive Devices', 'Request wheelchairs, hearing aids, and mobility tools.'); }} className="px-4 py-2 bg-alaga-blue text-white rounded-xl font-black uppercase tracking-widest text-xs transition-transform duration-200 hover:scale-105 shadow-sm">Details</button>
+                    <button onClick={(e) => { e.stopPropagation(); openAbout('Assistive Devices', 'Request wheelchairs, hearing aids, and mobility tools. Click Request in the details to proceed to login.'); }} className="px-4 py-2 border border-gray-200 rounded-xl text-xs uppercase tracking-widest">About</button>
                   </div>
                 </div>
               </div>
 
               {/* Medical Services Card */}
-              <div className="inflated-card bg-white dark:bg-alaga-charcoal rounded-[24px] overflow-hidden flex flex-col group hover:shadow-2xl transition-all h-fit p-6">
+              <div className="inflated-card bg-white dark:bg-alaga-charcoal rounded-[24px] overflow-hidden flex flex-col group hover:shadow-2xl transition-all h-full min-h-[260px] p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <span className="text-red-500 text-[10px] font-black uppercase tracking-widest">Clinical Support</span>
@@ -293,30 +293,10 @@ const LandingPage: React.FC = () => {
                   </div>
                   {medicalNotif && <span className="w-3 h-3 bg-red-500 rounded-full" />}
                 </div>
-                <p className="opacity-60 text-xs mt-4">Access medicines, therapeutic sessions, and medical referrals for PWD members.</p>
-                <div className="mt-6 flex items-center gap-3">
-                  <button onClick={() => openService('medical', 'Medical Services', 'Access medicines, therapeutic sessions, and medical referrals for PWD members.')} className="px-4 py-2 bg-red-500 text-white rounded-xl font-black text-xs">Details</button>
-                  <button onClick={() => openAbout('Medical Services', 'Access medicines and medical assistance. Click Request in the details to proceed to login.')} className="px-4 py-2 border border-gray-200 rounded-xl text-xs">About</button>
-                </div>
+
               </div>
 
-              {/* Livelihood Hub Card */}
-              <div className="inflated-card bg-white dark:bg-alaga-charcoal rounded-[24px] overflow-hidden flex flex-col group hover:shadow-2xl transition-all h-fit p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-alaga-teal text-[10px] font-black uppercase tracking-widest">Growth & Empowerment</span>
-                    <h3 className="text-2xl font-black mt-2">Livelihood Hub</h3>
-                  </div>
-                  {livelihoodNotif && <span className="w-3 h-3 bg-red-500 rounded-full" />}
-                </div>
-                <p className="opacity-60 text-xs mt-4">Access workshops in ethnic weaving, digital literacy, and strawberry processing tailored for PWD/CWD members.</p>
-                <div className="mt-6 flex items-center gap-3">
-                  <button onClick={() => openService('livelihood', 'Livelihood Hub', 'Workshops and grants to support PWD livelihoods.')} className="px-4 py-2 bg-alaga-teal text-white rounded-xl font-black text-xs">Details</button>
-                  <button onClick={() => openAbout('Livelihood Hub', 'Access workshops in ethnic weaving, digital literacy, and strawberry processing. Click Request in the details to proceed to login.')} className="px-4 py-2 border border-gray-200 rounded-xl text-xs">About</button>
-                </div>
-              </div>
             </div>
-
           </div>
       </section>
 
