@@ -5,6 +5,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import ChatWindow from './ChatWindow';
 import { useAppContext } from '@/context/AppContext';
 import { UserProfile } from '@/lib/types';
+import { OFFICE_ID } from '../constants';
 
 const FloatingAssistiveButton: React.FC = () => {
   const { currentUser, users } = useAppContext();
