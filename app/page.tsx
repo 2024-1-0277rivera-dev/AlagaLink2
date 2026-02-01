@@ -63,7 +63,7 @@ export default function Page() {
       <main className="min-h-[calc(100vh-80px)]">
         {renderPage()}
       </main>
-      {currentUser && currentPage !== 'home' && <FloatingAssistiveButton />}
+      {currentUser && <FloatingAssistiveButton />}
     </>
   );
 }

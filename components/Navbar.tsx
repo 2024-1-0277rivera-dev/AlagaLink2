@@ -244,8 +244,8 @@ const Navbar: React.FC<{ onNavigate: (page: string) => void, currentPage: string
         <div className="h-8 w-[1px] bg-white/20 mx-1 hidden lg:block"></div>
 
         <div className="flex items-center gap-2 md:gap-3">
-          {/* Notifications - only visible when logged in and not on Home */}
-          {currentUser && currentPage !== 'home' && (
+          {/* Notifications - visible when logged in (including Home for authenticated users) */}
+          {currentUser && (
             <div className="relative">
               <div 
                 className="relative cursor-pointer w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-[16px] md:rounded-[18px] bg-white/10 hover:bg-white/20 transition-all shadow-lg active:scale-90 inner-glow"

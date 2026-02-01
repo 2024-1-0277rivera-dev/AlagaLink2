@@ -274,11 +274,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onClose, targetUser, onBackToLi
               </p>
             </div>
           </div>
-          {!isEmbedded && (
-            <button onClick={onClose} className="hover:bg-white/10 w-10 h-10 shrink-0 flex items-center justify-center rounded-full transition-colors">
-              <i className="fa-solid fa-xmark text-xl"></i>
-            </button>
-          )}
+
         </div>
 
         <div ref={scrollRef} className="flex-1 p-6 overflow-y-auto space-y-4 bg-alaga-gray dark:bg-alaga-navy/20 no-scrollbar">

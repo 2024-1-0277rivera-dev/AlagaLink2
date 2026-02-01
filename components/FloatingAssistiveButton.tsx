@@ -100,13 +100,16 @@ const FloatingAssistiveButton: React.FC = () => {
     if (dragOccurred.current) return;
 
     if (isAdmin) {
+      // Toggle admin hub: open (and reset selection) or close if already open
       if (!showAdminHub) {
         setIsAiSelected(true);
         setActiveChatUser(null);
+        setShowAdminHub(true);
+      } else {
+        setShowAdminHub(false);
       }
-      setShowAdminHub(true);
     } else {
-      setIsOpen(!isOpen);
+      setIsOpen(prev => !prev);
     }
   };
 
@@ -166,15 +169,7 @@ const FloatingAssistiveButton: React.FC = () => {
       {/* BIG CENTERED ADMIN HUB */}
       {showAdminHub && isAdmin && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-8 bg-alaga-navy/60 backdrop-blur-md animate-in fade-in duration-300">
-          <button 
-            onClick={() => setShowAdminHub(false)} 
-            className="fixed top-8 right-8 z-[210] group flex items-center gap-3 bg-red-600 hover:bg-red-700 text-white px-6 py-4 rounded-[20px] shadow-[0_20px_50px_rgba(220,38,38,0.4)] border-2 border-white/20 transition-all active:scale-95 animate-in slide-in-from-right-8 duration-500"
-          >
-            <span className="text-xs font-black uppercase tracking-widest hidden md:inline">Exit Inbox</span>
-            <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center group-hover:rotate-90 transition-transform">
-              <i className="fa-solid fa-xmark text-lg"></i>
-            </div>
-          </button>
+
 
           <div 
             className="w-full max-w-6xl h-[85vh] bg-white dark:bg-alaga-charcoal shadow-[0_40px_100px_rgba(0,0,0,0.5)] rounded-[40px] flex flex-row border border-white/10 overflow-hidden animate-in zoom-in-95 duration-500 relative"
@@ -183,12 +178,6 @@ const FloatingAssistiveButton: React.FC = () => {
               <header className="p-6 bg-alaga-blue text-white shrink-0">
                 <div className="flex items-center justify-between">
                   <h3 className="font-black text-xl tracking-tighter">Inbox Hub</h3>
-                  <button 
-                    onClick={() => setShowAdminHub(false)} 
-                    className="w-10 h-10 rounded-xl bg-white/10 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center shadow-lg group"
-                  >
-                    <i className="fa-solid fa-arrow-left text-xs group-hover:-translate-x-1 transition-transform"></i>
-                  </button>
                 </div>
                 <div className="mt-4 flex bg-white/10 p-1 rounded-xl">
                   <button onClick={() => setHubTab('PWD')} className={`flex-1 py-2 text-[9px] font-black uppercase rounded-lg transition-all ${hubTab === 'PWD' ? 'bg-white text-alaga-blue shadow-lg' : 'opacity-60'}`}>Members</button>
