@@ -293,11 +293,32 @@ const LandingPage: React.FC = () => {
                   </div>
                   {medicalNotif && <span className="w-3 h-3 bg-red-500 rounded-full" />}
                 </div>
-
+                <p className="opacity-60 text-xs mt-4 flex-1">Access medicines, therapeutic sessions, and medical referrals for PWD members.</p>
+                <div className="mt-6 flex items-center gap-3">
+                  <button onClick={(e) => { e.stopPropagation(); openService('medical', 'Medical Services', 'Access medicines, therapeutic sessions, and medical referrals for PWD members.'); }} className="px-4 py-2 bg-red-500 text-white rounded-xl font-black text-xs">Details</button>
+                  <button onClick={(e) => { e.stopPropagation(); openAbout('Medical Services', 'Access medicines and medical assistance. Click Request in the details to proceed to login.'); }} className="px-4 py-2 border border-gray-200 rounded-xl text-xs">About</button>
+                </div>
               </div>
 
+              {/* Livelihood Hub Card */}
+              <div className="inflated-card bg-white dark:bg-alaga-charcoal rounded-[24px] overflow-hidden flex flex-col group hover:shadow-2xl transition-all h-fit p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-alaga-teal text-[10px] font-black uppercase tracking-widest">Growth & Empowerment</span>
+                    <h3 className="text-2xl font-black mt-2">Livelihood Hub</h3>
+                  </div>
+                  {livelihoodNotif && <span className="w-3 h-3 bg-red-500 rounded-full" />}
+                </div>
+                <p className="opacity-60 text-xs mt-4">Access workshops in ethnic weaving, digital literacy, and strawberry processing tailored for PWD/CWD members.</p>
+                <div className="mt-6 flex items-center gap-3">
+                  <button onClick={(e) => { e.stopPropagation(); openService('livelihood', 'Livelihood Hub', 'Workshops and grants to support PWD livelihoods.'); }} className="px-4 py-2 bg-alaga-teal text-white rounded-xl font-black text-xs">Details</button>
+                  <button onClick={(e) => { e.stopPropagation(); openAbout('Livelihood Hub', 'Access workshops in ethnic weaving, digital literacy, and strawberry processing. Click Request in the details to proceed to login.'); }} className="px-4 py-2 border border-gray-200 rounded-xl text-xs">About</button>
+                </div>
+              </div>
             </div>
+
           </div>
+        </div>
       </section>
 
       <section id="community-vigil" ref={missingRef} className="py-32 px-6">
