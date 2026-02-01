@@ -32,7 +32,7 @@ interface ChatWindowProps {
 }
 
 const ChatWindow: React.FC<ChatWindowProps> = ({ onClose, targetUser, onBackToList, anchorPosition, isEmbedded = false }) => {
-  const { currentUser, setSearchSignal, isDarkMode, directMessages, sendDirectMessage } = useAppContext();
+  const { currentUser, setSearchSignal, isDarkMode, directMessages, sendDirectMessage, users } = useAppContext();
   const isAdmin = currentUser?.role === 'Admin' || currentUser?.role === 'SuperAdmin';
   
   const isAiSelected = isAdmin && !targetUser;
