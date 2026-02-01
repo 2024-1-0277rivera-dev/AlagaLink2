@@ -37,7 +37,7 @@ const CommunityVigilCarousel: React.FC = () => {
             <button
               key={m.id}
               onClick={() => setSelected(m)}
-              className={`absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out transform-gpu ${visible ? 'opacity-100 z-20' : 'opacity-0 z-10'} group`
+              className={`absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out transform-gpu ${visible ? 'opacity-100 z-20' : 'opacity-0 z-10'} group`}
               aria-label={`View details for ${m.name}`}
             >
               <img src={m.photoUrl || `https://picsum.photos/seed/${m.id}/1200/900`} alt={m.name} className="w-full h-full object-cover rounded-[16px]" />
