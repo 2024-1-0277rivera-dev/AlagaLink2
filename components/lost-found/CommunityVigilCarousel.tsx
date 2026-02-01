@@ -2,8 +2,8 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { LostReport } from '../../types';
 import CaseDetailModal from './CaseDetailModal';
-import { MOCK_MISSING } from '../../mockdata/lost-found/missing';
-import { MOCK_FOUND } from '../../mockdata/lost-found/found';
+import { MOCK_MISSING } from '../../mockData/lost-found/missing';
+import { MOCK_FOUND } from '../../mockData/lost-found/found';
 
 const AUTO_ROTATE_MS = 5000;
 
