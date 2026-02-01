@@ -114,7 +114,12 @@ const FloatingAssistiveButton: React.FC = () => {
     } else {
       setIsOpen(prev => {
         const next = !prev;
-        if (!next) setSelectedThread(null);
+        if (!next) {
+          setSelectedThread(null);
+        } else {
+          // default to AI thread when opening the popover
+          setSelectedThread('AI');
+        }
         return next;
       });
     }
@@ -317,25 +322,64 @@ const FloatingAssistiveButton: React.FC = () => {
 
       {/* REGULAR USER CHAT POP-OVER */}
       {isOpen && !isAdmin && (
-        <div style={{ left: position.x - 12, top: position.y - 320 }} className="fixed z-[220] w-[360px] max-w-[90vw] shadow-2xl rounded-2xl overflow-hidden animate-in zoom-in-95 bg-white dark:bg-alaga-charcoal border border-gray-100 dark:border-white/10">
-          {/* If no thread selected, show choices */}
-          {!selectedThread ? (
-            <div className="p-4">
-              <div className="flex items-center justify-between mb-3">
-                <h4 className="font-black">Support Threads</h4>
-                <button onClick={() => { setIsOpen(false); setSelectedThread(null); }} className="text-sm opacity-60">Close</button>
+        <div className="fixed inset-0 z-[220] flex items-center justify-center p-6">
+          <div role="dialog" aria-modal="true" className="w-full max-w-4xl h-[75vh] bg-white dark:bg-alaga-charcoal rounded-[24px] shadow-2xl overflow-hidden flex">
+            {/* LEFT: Contacts */}
+            <aside className="w-72 border-r border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-black/10 p-4 flex flex-col">
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="font-black">Contacts</h4>
+                {/* Note: closing handled by floating button */}
+                <span className="text-xs opacity-50">Tap the floating button to close</span>
               </div>
-              <p className="text-sm opacity-60 mb-4">Choose who you'd like to message. The Office consolidates replies from PDAO staff.</p>
-              <div className="grid grid-cols-2 gap-3">
-                <button onClick={() => setSelectedThread('AI')} className="p-4 rounded-xl bg-alaga-blue text-white font-black">AlagaLink Bot</button>
-                <button onClick={() => setSelectedThread('Office')} className="p-4 rounded-xl bg-alaga-teal text-white font-black">PDAO Office</button>
+
+              <div className="space-y-3">
+                <button
+                  onClick={() => setSelectedThread('AI')}
+                  className={`w-full text-left p-3 rounded-lg flex items-center gap-3 transition-all ${selectedThread === 'AI' ? 'bg-alaga-blue text-white' : 'hover:bg-white/50'}`}>
+                  <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-alaga-blue">
+                    <i className="fa-solid fa-robot"></i>
+                  </div>
+                  <div>
+                    <p className="font-black">AlagaLink Bot</p>
+                    <p className="text-xs opacity-60">Automated assistant</p>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => setSelectedThread('Office')}
+                  className={`w-full text-left p-3 rounded-lg flex items-center gap-3 transition-all ${selectedThread === 'Office' ? 'bg-alaga-teal text-white' : 'hover:bg-white/50'}`}>
+                  <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-alaga-teal">
+                    <i className="fa-solid fa-building"></i>
+                  </div>
+                  <div>
+                    <p className="font-black">PDAO Office</p>
+                    <p className="text-xs opacity-60">Consolidated staff replies</p>
+                  </div>
+                </button>
               </div>
-            </div>
-          ) : selectedThread === 'AI' ? (
-            <ChatWindow onClose={() => { setIsOpen(false); setSelectedThread(null); }} anchorPosition={position} isEmbedded={true} />
-          ) : (
-            <ChatWindow onClose={() => { setIsOpen(false); setSelectedThread(null); }} targetUser={{ id: OFFICE_ID, firstName: 'PDAO Office', lastName: '', role: 'User' } as any} anchorPosition={position} isEmbedded={true} />
-          )}
+
+              <div className="mt-auto text-xs opacity-60">Office replies are consolidated and shown as "PDAO Office" to members.</div>
+            </aside>
+
+            {/* RIGHT: Messaging area */}
+            <main className="flex-1 p-4">
+              {selectedThread === 'AI' && (
+                <div className="h-full flex flex-col">
+                  <div className="flex-1 overflow-hidden rounded-lg border border-gray-100 dark:border-white/5">
+                    <ChatWindow onClose={() => { setIsOpen(false); setSelectedThread(null); }} isEmbedded={true} anchorPosition={position} />
+                  </div>
+                </div>
+              )}
+
+              {selectedThread === 'Office' && (
+                <div className="h-full flex flex-col">
+                  <div className="flex-1 overflow-hidden rounded-lg border border-gray-100 dark:border-white/5">
+                    <ChatWindow onClose={() => { setIsOpen(false); setSelectedThread(null); }} targetUser={{ id: OFFICE_ID, firstName: 'PDAO Office', lastName: '', role: 'User' } as any} isEmbedded={true} anchorPosition={position} />
+                  </div>
+                </div>
+              )}
+            </main>
+          </div>
         </div>
       )}
     </>
