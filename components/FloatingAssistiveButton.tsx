@@ -13,6 +13,8 @@ const FloatingAssistiveButton: React.FC = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [showAdminHub, setShowAdminHub] = useState(false);
   const [activeChatUser, setActiveChatUser] = useState<UserProfile | null>(null);
+  // For non-admin users, track which thread they selected in their compact popover
+  const [selectedThread, setSelectedThread] = useState<'AI' | 'Office' | null>(null);
 
   // Initialize position on mount
   useEffect(() => {
@@ -109,7 +111,11 @@ const FloatingAssistiveButton: React.FC = () => {
         setShowAdminHub(false);
       }
     } else {
-      setIsOpen(prev => !prev);
+      setIsOpen(prev => {
+        const next = !prev;
+        if (!next) setSelectedThread(null);
+        return next;
+      });
     }
   };
 
@@ -182,6 +188,32 @@ const FloatingAssistiveButton: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <h3 className="font-black text-xl tracking-tighter">Inbox Hub</h3>
                 </div>
+              {/* Active responder indicator for office threads (admins/superadmins only) */}
+              {activeChatUser && (
+                <div className="mt-3 flex items-center gap-3 text-sm">
+                  <div className="w-8 h-8 rounded-xl overflow-hidden">
+                    {/* profile of last staff who replied (rendered below via computed variable) */}
+                    {(() => {
+                      const threadKey = [OFFICE_ID, activeChatUser.id].sort().join('_');
+                      const msgs = directMessages[threadKey] || [];
+                      const lastStaff = msgs.slice().reverse().find(m => {
+                        const u = users.find(us => us.id === m.senderId);
+                        return u && (u.role === 'Admin' || u.role === 'SuperAdmin');
+                      });
+                      if (lastStaff) {
+                        const staff = users.find(us => us.id === lastStaff.senderId);
+                        return (
+                          <div className="flex items-center gap-2">
+                            <img src={staff?.photoUrl} className="w-8 h-8 rounded-xl object-cover shadow-sm" />
+                            <div className="text-xs font-black uppercase">Handled by <span className="ml-1 text-alaga-blue">{staff?.firstName}</span></div>
+                          </div>
+                        );
+                      }
+                      return <div className="text-xs opacity-60">No active responder</div>;
+                    })()}
+                  </div>
+                </div>
+              )}
                 <div className="mt-4 flex bg-white/10 p-1 rounded-xl">
                   <button onClick={() => setHubTab('PWD')} className={`flex-1 py-2 text-[9px] font-black uppercase rounded-lg transition-all ${hubTab === 'PWD' ? 'bg-white text-alaga-blue shadow-lg' : 'opacity-60'}`}>Members</button>
                   {isSuperAdmin && <button onClick={() => setHubTab('Staff')} className={`flex-1 py-2 text-[9px] font-black uppercase rounded-lg transition-all ${hubTab === 'Staff' ? 'bg-white text-alaga-blue shadow-lg' : 'opacity-60'}`}>Staff</button>}
@@ -282,12 +314,28 @@ const FloatingAssistiveButton: React.FC = () => {
         </div>
       )}
 
-      {/* REGULAR USER CHAT WINDOW */}
+      {/* REGULAR USER CHAT POP-OVER */}
       {isOpen && !isAdmin && (
-        <ChatWindow 
-          onClose={() => setIsOpen(false)} 
-          anchorPosition={position}
-        />
+        <div style={{ left: position.x - 12, top: position.y - 320 }} className="fixed z-[220] w-[360px] max-w-[90vw] shadow-2xl rounded-2xl overflow-hidden animate-in zoom-in-95 bg-white dark:bg-alaga-charcoal border border-gray-100 dark:border-white/10">
+          {/* If no thread selected, show choices */}
+          {!selectedThread ? (
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="font-black">Support Threads</h4>
+                <button onClick={() => { setIsOpen(false); setSelectedThread(null); }} className="text-sm opacity-60">Close</button>
+              </div>
+              <p className="text-sm opacity-60 mb-4">Choose who you'd like to message. The Office consolidates replies from PDAO staff.</p>
+              <div className="grid grid-cols-2 gap-3">
+                <button onClick={() => setSelectedThread('AI')} className="p-4 rounded-xl bg-alaga-blue text-white font-black">AlagaLink Bot</button>
+                <button onClick={() => setSelectedThread('Office')} className="p-4 rounded-xl bg-alaga-teal text-white font-black">PDAO Office</button>
+              </div>
+            </div>
+          ) : selectedThread === 'AI' ? (
+            <ChatWindow onClose={() => { setIsOpen(false); setSelectedThread(null); }} anchorPosition={position} isEmbedded={true} />
+          ) : (
+            <ChatWindow onClose={() => { setIsOpen(false); setSelectedThread(null); }} targetUser={{ id: OFFICE_ID, firstName: 'PDAO Office', lastName: '', role: 'User' } as any} anchorPosition={position} isEmbedded={true} />
+          )}
+        </div>
       )}
     </>
   );

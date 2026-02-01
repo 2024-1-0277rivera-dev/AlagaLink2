@@ -1,6 +1,8 @@
 
 'use client';
 
+'use client';
+
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { 
   MOCK_USERS, 
@@ -11,12 +13,14 @@ import {
 } from '../mockData/index';
 import { useAppContext } from '../context/AppContext';
 import { UserProfile } from '../types';
+import { OFFICE_ID } from '../constants';
 
 interface ChatMessage {
   role: 'user' | 'bot';
   text: string;
   senderName?: string;
   isDirect?: boolean;
+  senderProfile?: { id: string; fullName: string; photoUrl?: string };
 }
 
 interface ChatWindowProps {
@@ -84,14 +88,50 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onClose, targetUser, onBackToLi
 
   const displayMessages = useMemo(() => {
     if (targetUser && currentUser) {
-      const threadKey = [currentUser.id, targetUser.id].sort().join('_');
+      // Determine which thread to use. For ADMIN -> PWD replies, we consolidate into OFFICE thread.
+      let threadKey: string;
+      let isOfficeThread = false;
+
+      const targetIsOffice = targetUser.id === OFFICE_ID;
+      const targetIsUser = (targetUser as any).role === 'User';
+
+      if (targetIsOffice) {
+        threadKey = [currentUser.id, OFFICE_ID].sort().join('_');
+        isOfficeThread = true;
+      } else if (currentUser.role !== 'User' && targetIsUser) {
+        // Admin viewing a user's thread: show OFFICE <-> user thread
+        threadKey = [OFFICE_ID, targetUser.id].sort().join('_');
+        isOfficeThread = true;
+      } else {
+        threadKey = [currentUser.id, targetUser.id].sort().join('_');
+      }
+
       const realMessages = directMessages[threadKey] || [];
-      const converted: ChatMessage[] = realMessages.map(m => ({
-        role: m.senderId === currentUser.id ? 'user' : 'bot',
-        text: m.text,
-        senderName: m.senderId === currentUser.id ? 'You' : targetUser.firstName,
-        isDirect: true
-      }));
+
+      const converted: ChatMessage[] = realMessages.map(m => {
+        const isFromCurrent = m.senderId === currentUser.id;
+
+        // If this is an office thread and the viewer is a regular user, consolidate staff messages into 'PDAO Office'
+        if (isOfficeThread && currentUser.role === 'User' && !isFromCurrent) {
+          return {
+            role: 'bot' as const,
+            text: m.text,
+            senderName: 'PDAO Office',
+            isDirect: true
+          };
+        }
+
+        // For admins viewing office threads, show actual staff profile information
+        const staffUser = users.find(u => u.id === m.senderId);
+        return {
+          role: m.senderId === currentUser.id ? 'user' : 'bot',
+          text: m.text,
+          senderName: isFromCurrent ? 'You' : (staffUser ? staffUser.firstName : (m.senderId === OFFICE_ID ? 'PDAO Office' : 'Unknown')),
+          isDirect: true,
+          senderProfile: staffUser ? { id: staffUser.id, fullName: `${staffUser.firstName} ${staffUser.lastName}`, photoUrl: staffUser.photoUrl } : undefined
+        };
+      });
+
       return [
         { 
           role: 'bot' as const, 
@@ -103,7 +143,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onClose, targetUser, onBackToLi
     } else {
       return aiMessages;
     }
-  }, [targetUser, currentUser, directMessages, aiMessages]);
+  }, [targetUser, currentUser, directMessages, aiMessages, users]);
 
   useEffect(() => {
     if (!targetUser) {
@@ -202,38 +242,46 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onClose, targetUser, onBackToLi
             {msg.senderName}
           </span>
         )}
-        <div className={`max-w-[85%] px-5 py-3 rounded-[20px] text-sm font-medium leading-relaxed shadow-sm relative ${
-          msg.role === 'user' 
-            ? 'bg-alaga-blue text-white rounded-br-none' 
-            : 'bg-white dark:bg-alaga-charcoal text-gray-800 dark:text-white rounded-bl-none border border-gray-100 dark:border-white/5'
-        }`}>
-          {parts.map((part, i) => {
-            const match = part.match(/\[\[(.*?)\|(.*?)\|(.*?)\]\]/);
-            if (match) {
-              const [_, name, id, type] = match;
-              const registryItem = municipalRegistry.find(ri => ri.id === id);
-              const chipColor = type === 'Page' ? 'bg-alaga-gold/20 text-alaga-navy dark:text-alaga-gold border-alaga-gold/30' : 
-                               type === 'Item' ? 'bg-alaga-blue/10 text-alaga-blue border-alaga-blue/20' :
-                               type === 'Case' ? 'bg-red-500/10 text-red-500 border-red-500/20' :
-                               'bg-alaga-teal/10 text-alaga-teal border-alaga-teal/20';
 
-              return (
-                <span 
-                  key={i} 
-                  onMouseEnter={(e) => {
-                    const rect = e.currentTarget.getBoundingClientRect();
-                    setHoverData({ title: name, image: registryItem?.image || '', x: rect.left, y: rect.top - 120 });
-                  }}
-                  onMouseLeave={() => setHoverData(null)}
-                  onClick={() => handleTokenClick(id)}
-                  className={`inline-block px-2 py-0.5 rounded-lg border font-black cursor-pointer transition-all hover:scale-105 mx-0.5 ${chipColor}`}
-                >
-                  {name}
-                </span>
-              );
-            }
-            return part;
-          })}
+        <div className="flex items-start gap-3">
+          {/* Show staff avatar for admin views when available */}
+          {msg.senderProfile && currentUser?.role !== 'User' && (
+            <img src={msg.senderProfile.photoUrl} title={msg.senderProfile.fullName} alt={msg.senderProfile.fullName} className="w-8 h-8 rounded-xl object-cover shadow-sm" />
+          )}
+
+          <div className={`max-w-[85%] px-5 py-3 rounded-[20px] text-sm font-medium leading-relaxed shadow-sm relative ${
+            msg.role === 'user' 
+              ? 'bg-alaga-blue text-white rounded-br-none' 
+              : 'bg-white dark:bg-alaga-charcoal text-gray-800 dark:text-white rounded-bl-none border border-gray-100 dark:border-white/5'
+          }`} title={msg.senderProfile ? (currentUser?.role !== 'User' && targetUser ? `${msg.senderProfile.fullName} • replying to ${targetUser.firstName} ${targetUser.lastName}` : msg.senderProfile.fullName) : undefined}>
+            {parts.map((part, i) => {
+              const match = part.match(/\[\[(.*?)\|(.*?)\|(.*?)\]\]/);
+              if (match) {
+                const [_, name, id, type] = match;
+                const registryItem = municipalRegistry.find(ri => ri.id === id);
+                const chipColor = type === 'Page' ? 'bg-alaga-gold/20 text-alaga-navy dark:text-alaga-gold border-alaga-gold/30' : 
+                                 type === 'Item' ? 'bg-alaga-blue/10 text-alaga-blue border-alaga-blue/20' :
+                                 type === 'Case' ? 'bg-red-500/10 text-red-500 border-red-500/20' :
+                                 'bg-alaga-teal/10 text-alaga-teal border-alaga-teal/20';
+
+                return (
+                  <span 
+                    key={i} 
+                    onMouseEnter={(e) => {
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      setHoverData({ title: name, image: registryItem?.image || '', x: rect.left, y: rect.top - 120 });
+                    }}
+                    onMouseLeave={() => setHoverData(null)}
+                    onClick={() => handleTokenClick(id)}
+                    className={`inline-block px-2 py-0.5 rounded-lg border font-black cursor-pointer transition-all hover:scale-105 mx-0.5 ${chipColor}`}
+                  >
+                    {name}
+                  </span>
+                );
+              }
+              return part;
+            })}
+          </div>
         </div>
       </div>
     );
