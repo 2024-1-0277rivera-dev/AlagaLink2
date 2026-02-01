@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { UserProfile, LostReport, FormSection, ProgramAvailment, DirectMessage } from '@/lib/types';
 import { MOCK_USERS, MOCK_REPORTS, MOCK_PROGRAM_RECORDS, MOCK_NOTIFICATION_HISTORY } from '@/mockData/index';
+import { OFFICE_ID } from '../constants';
 
 export interface Notification {
   id: string;
@@ -229,14 +230,29 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const sendDirectMessage = (toUserId: string, text: string) => {
     if (!currentUser) return;
-    const threadKey = [currentUser.id, toUserId].sort().join('_');
+
+    // If an admin/superadmin is replying to a PWD, consolidate messages into the OFFICE thread
+    let recipientForThread = toUserId;
+    let meta: any = undefined;
+
+    const recipientUser = users.find(u => u.id === toUserId);
+
+    if (currentUser.role !== 'User' && recipientUser && recipientUser.role === 'User') {
+      // Admin replying to a PWD: write into the OFFICE <-> PWD thread and mark meta
+      recipientForThread = OFFICE_ID;
+      meta = { viaOffice: true };
+    }
+
+    const threadKey = [recipientForThread, currentUser.id].sort().join('_');
+
     const newMessage: DirectMessage = {
       id: `msg-${Date.now()}`,
       senderId: currentUser.id,
       text,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      meta
     };
-    
+
     setDirectMessages(prev => ({
       ...prev,
       [threadKey]: [...(prev[threadKey] || []), newMessage]

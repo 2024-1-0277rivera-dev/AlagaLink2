@@ -52,6 +52,10 @@ export interface DirectMessage {
   senderId: string;
   text: string;
   timestamp: string;
+  // optional metadata for special routing (e.g., messages delivered via consolidated office)
+  meta?: {
+    viaOffice?: boolean;
+  };
 }
 
 export interface UserProfile {

@@ -29,3 +29,6 @@ export const DEVELOPERS = [
 ];
 
 export const CONTRIBUTORS = ["Bhenny Benlor Rivera"];
+
+// Special synthetic participant id used for consolidated office messaging
+export const OFFICE_ID = 'PDAO_OFFICE';
