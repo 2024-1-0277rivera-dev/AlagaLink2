@@ -66,29 +66,28 @@ const CommunityVigilCarousel: React.FC = () => {
             <div key={m.id} className={`absolute inset-0 w-full h-full transition-opacity duration-800 ease-in-out transform-gpu ${visible ? 'opacity-100 z-20' : 'opacity-0 z-10'}`} aria-hidden={!visible}>
               <div className="absolute inset-0 w-full h-full overflow-hidden flex items-stretch gap-8">
 
-                {/* LEFT: Image card (smaller) */}
-                <button onClick={() => setSelected(m)} className={`w-2/5 h-full relative overflow-hidden rounded-[14px] shadow-2xl transform-gpu transition-transform duration-[12000ms] ease-in-out ${visible ? 'scale-105' : 'scale-100'}`} aria-label={`View photo of ${m.name}`}>
-                  <img src={m.photoUrl || `https://picsum.photos/seed/${m.id}/1600/1000`} alt={m.name} className="w-full h-full object-cover object-center rounded-[14px] filter brightness-[1.06] contrast-[1.04]" />
+                {/* LEFT: Image card (smaller, more rounded) */}
+                <button onClick={() => setSelected(m)} className={`w-2/5 h-full relative overflow-hidden rounded-[24px] shadow-2xl transform-gpu transition-transform duration-[12000ms] ease-in-out ${visible ? 'scale-105' : 'scale-100'}`} aria-label={`View photo of ${m.name}`}>
+                  <img src={m.photoUrl || `https://picsum.photos/seed/${m.id}/1600/1000`} alt={m.name} className="w-full h-full object-cover object-center rounded-[24px] filter brightness-[1.06] contrast-[1.04]" />
 
                   {/* Section icon inside image (top-left) */}
-                  <div className="absolute top-6 left-6 z-40">
-                    <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-red-500 text-lg shadow-lg">
+                  <div className="absolute top-4 left-4 z-40">
+                    <div className="w-11 h-11 bg-white/12 rounded-xl flex items-center justify-center text-red-500 text-lg shadow-md">
                       <i className="fa-solid fa-person-circle-question"></i>
                     </div>
                   </div>
                 </button>
 
-                {/* RIGHT: expanded info card */}
+                {/* RIGHT: expanded info (not enclosed) */}
                 <div className="w-3/5 h-full flex items-center">
-                  <div className={`w-full p-8 rounded-[12px] bg-white dark:bg-alaga-charcoal shadow-lg transform ${visible ? 'translate-x-0 opacity-100' : 'translate-x-6 opacity-0'} transition-all duration-700`}> 
-                    <h3 className="text-5xl font-extrabold mb-3 text-alaga-navy dark:text-white drop-shadow-lg">{m.name}</h3>
-                    <p className="text-lg opacity-80 mb-1"><span className="font-black">Last seen:</span> <span className="font-semibold">{m.lastSeen}</span></p>
-                    <p className="text-lg opacity-80 mb-1"><span className="font-black">Disability:</span> <span className="font-semibold">{m.description}</span></p>
-                    <p className="text-lg opacity-80 mb-3"><span className="font-black">Address:</span> <span className="font-semibold">{m.lastSeen}</span></p>
+                  <div onClick={() => setSelected(m)} role="button" tabIndex={0} className={`w-full transform ${visible ? 'translate-x-0 opacity-100' : 'translate-x-6 opacity-0'} transition-all duration-700 cursor-pointer`}>
+                    <h3 className="text-6xl md:text-7xl font-extrabold mb-3 text-alaga-navy dark:text-white drop-shadow-2xl">{m.name}</h3>
+                    <p className="text-xl opacity-85 mb-1"><span className="font-black">Last seen:</span> <span className="font-semibold">{m.lastSeen}</span></p>
+                    <p className="text-lg opacity-85 mb-1"><span className="font-black">Disability:</span> <span className="font-semibold">{m.description}</span></p>
+                    <p className="text-lg opacity-85 mb-3"><span className="font-black">Address:</span> <span className="font-semibold">{m.lastSeen}</span></p>
 
-                    <div className="mt-6 flex items-center gap-4">
-                      <div className={`px-4 py-2 rounded-full text-sm font-black uppercase tracking-widest ${urgencyClasses} ${urgencyLevel === 'red' ? 'animate-pulse shadow-lg' : 'shadow-sm'}`}>{urgencyLevel === 'red' ? 'URGENT' : `${Math.max(1, hours)}h`}</div>
-                      <div className="text-sm opacity-70">Tap to open full profile</div>
+                    <div className="mt-6">
+                      <div className={`inline-block px-4 py-2 rounded-full text-sm font-black uppercase tracking-widest ${urgencyClasses} ${urgencyLevel === 'red' ? 'animate-pulse shadow-lg scale-105' : 'shadow-sm'}`} aria-hidden>{urgencyLevel === 'red' ? 'URGENT' : `${Math.max(1, hours)}h Missing`}</div>
                     </div>
 
                   </div>
@@ -104,9 +103,9 @@ const CommunityVigilCarousel: React.FC = () => {
 
       {/* Slide indicators (centered) */}
       {missing.length > 1 && (
-        <div className="mt-6 flex items-center justify-center gap-3">
+        <div className="mt-6 flex items-center justify-center gap-4" role="tablist" aria-label="Missing person slides">
           {missing.map((_, i) => (
-            <button key={i} onClick={() => setIndex(i)} className={`w-3 h-3 rounded-full ${i === index ? 'bg-alaga-blue' : 'bg-white/40'}`} aria-label={`Show slide ${i + 1}`}></button>
+            <button key={i} onClick={() => setIndex(i)} aria-label={`Show slide ${i + 1}`} role="tab" aria-selected={i === index} className={`${i === index ? 'w-5 h-5 rounded-full bg-alaga-blue shadow-md' : 'w-2 h-2 rounded-full border-2 border-white/40 bg-transparent'}`}></button>
           ))}
         </div>
       )}

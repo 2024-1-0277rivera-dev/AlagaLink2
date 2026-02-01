@@ -146,10 +146,10 @@ const LandingPage: React.FC = () => {
 
       <section id="community-vigil" ref={missingRef} className="py-20 px-6 bg-transparent">
         <div className="max-w-7xl mx-auto">
-          <div className="mb-8 text-center">
-            <h2 className="text-4xl md:text-5xl font-black">Community Vigilance</h2>
-            <p className="text-xs font-black uppercase tracking-[0.3em] opacity-30">Lost & Found Recovery System</p>
-            <p className="text-sm opacity-60 mt-3">Our community-driven missing & found registry highlights urgent cases and recent recoveries.</p>
+          <div className="mb-12 md:mb-16 text-center">
+            <h2 className="text-5xl md:text-6xl font-extrabold leading-tight">Community Vigilance</h2>
+            <p className="text-xs font-black uppercase tracking-[0.3em] opacity-30 mt-2">Lost & Found Recovery System</p>
+            <p className="text-sm opacity-60 mt-4 max-w-2xl mx-auto">Our community-driven missing & found registry highlights urgent cases and recent recoveries.</p>
           </div>
 
           <CommunityVigilCarousel />
