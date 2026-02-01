@@ -143,7 +143,8 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
   // Search Signal Hook
   useEffect(() => {
     if (searchSignal && searchSignal.page === 'home' && searchSignal.itemId) {
-      const targetUpdate = dynamicUpdates.find(u => u.itemId === searchSignal.itemId || u.id.toString() === searchSignal.itemId.replace('news-', ''));
+      const itemId = searchSignal.itemId;
+      const targetUpdate = dynamicUpdates.find(u => u.itemId === itemId || u.id.toString() === itemId.replace('news-', ''));
       if (targetUpdate) setSelectedUpdate(targetUpdate);
     }
   }, [searchSignal, dynamicUpdates]);

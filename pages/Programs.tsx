@@ -1,4 +1,5 @@
 
+'use client';
 import React, { useState, useMemo, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { ProgramAvailment, LivelihoodProgram, AssistiveDevice, MedicalService, Narrative, UserProfile, DisabilityCategory } from '../types';
