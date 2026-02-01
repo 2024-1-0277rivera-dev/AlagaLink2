@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useAppContext } from '../../context/AppContext';
 import { DisabilityCategory } from '../../types';
 import RegistrationWorkflow from '../members/RegistrationWorkflow';
+import CommunityVigilCarousel from '../lost-found/CommunityVigilCarousel';
 
 const LandingPage: React.FC = () => {
   const { loginWithPassword, addUser, loginById, addProgramRequest, searchSignal, setSearchSignal, notifications, currentUser } = useAppContext();
