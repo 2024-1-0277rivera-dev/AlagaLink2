@@ -80,14 +80,26 @@ const CommunityVigilCarousel: React.FC = () => {
 
                 {/* RIGHT: expanded info (not enclosed) */}
                 <div className="w-3/5 h-full flex items-center">
-                  <div onClick={() => setSelected(m)} role="button" tabIndex={0} className={`w-full transform ${visible ? 'translate-x-0 opacity-100' : 'translate-x-6 opacity-0'} transition-all duration-700 cursor-pointer`}>
-                    <h3 className="text-6xl md:text-7xl font-extrabold mb-3 text-alaga-navy dark:text-white drop-shadow-2xl">{m.name}</h3>
-                    <p className="text-xl opacity-85 mb-1"><span className="font-black">Last seen:</span> <span className="font-semibold">{m.lastSeen}</span></p>
-                    <p className="text-lg opacity-85 mb-1"><span className="font-black">Disability:</span> <span className="font-semibold">{m.description}</span></p>
-                    <p className="text-lg opacity-85 mb-3"><span className="font-black">Address:</span> <span className="font-semibold">{m.lastSeen}</span></p>
+                  <div onClick={() => setSelected(m)} role="button" tabIndex={0} className={`w-full relative transform ${visible ? 'translate-x-0 opacity-100' : 'translate-x-6 opacity-0'} transition-all duration-700 cursor-pointer`}>
 
-                    <div className="mt-6">
-                      <div className={`inline-block px-4 py-2 rounded-full text-sm font-black uppercase tracking-widest ${urgencyClasses} ${urgencyLevel === 'red' ? 'animate-pulse shadow-lg scale-105' : 'shadow-sm'}`} aria-hidden>{urgencyLevel === 'red' ? 'URGENT' : `${Math.max(1, hours)}h Missing`}</div>
+                    {/* Faint decorative icon behind content for aesthetic */}
+                    <i aria-hidden className="fa-solid fa-person-circle-question absolute -right-8 -top-10 text-[220px] text-black/6 dark:text-white/6 pointer-events-none select-none"></i>
+
+                    <div className="relative z-10">
+                      <h3 className="text-7xl md:text-8xl lg:text-9xl font-extrabold mb-2 leading-tight text-alaga-navy dark:text-white">{m.name}</h3>
+
+                      <p className="text-sm font-bold text-gray-400 dark:text-gray-300 mb-4 uppercase tracking-wide">{m.description}</p>
+
+                      <div className="text-sm text-gray-700 dark:text-gray-200 space-y-2 mb-4">
+                        <div><span className="font-black">Last seen:</span> <span className="font-medium">{m.lastSeen} • {m.missingNarrative?.when || `${Math.max(1, hours)}h ago`}</span></div>
+                        <div><span className="font-black">Clothes:</span> <span className="font-medium">{m.clothes || 'N/A'}</span></div>
+                        <div><span className="font-black">Body type:</span> <span className="font-medium">{m.bodyType || 'N/A'}</span> &nbsp; <span className="font-black">Height:</span> <span className="font-medium">{m.height || 'N/A'}</span></div>
+                        {m.dissemination?.context && <div><span className="font-black">Notes:</span> <span className="font-medium">{m.dissemination.context}</span></div>}
+                      </div>
+
+                      <div className="mt-6">
+                        <div className={`inline-block px-4 py-2 rounded-lg text-sm font-black ${hours < 24 ? 'bg-alaga-blue text-white' : 'bg-red-600 text-white'}`}>{hours < 24 ? `${hours}h Missing` : `${Math.floor(hours/24)}d ${hours%24}h Missing`}</div>
+                      </div>
                     </div>
 
                   </div>
