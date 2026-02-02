@@ -2,6 +2,7 @@
 'use client';
 /* eslint-disable react-hooks/purity -- Program handlers intentionally use runtime-generated ids and randomness in event handlers; rule is overly strict for these safe operations */
 import React, { useState, useMemo, useEffect } from 'react';
+import Image from 'next/image';
 import { useAppContext } from '../context/AppContext';
 import { ProgramAvailment, LivelihoodProgram, AssistiveDevice, MedicalService, Narrative, UserProfile, DisabilityCategory } from '../types';
 import { MOCK_LIVELIHOODS, MOCK_DEVICES, MOCK_MEDICAL } from '../mockData/index';
@@ -346,7 +347,11 @@ const Programs: React.FC = () => {
                     {idSearchResults.map(u => (
                       <div key={u.id} className="flex items-center justify-between p-6 hover:bg-alaga-blue/5 rounded-3xl transition-all group border border-transparent hover:border-alaga-blue/20">
                         <div className="flex items-center gap-6">
-                          <img src={u.photoUrl} className="w-16 h-16 rounded-2xl object-cover shadow-lg group-hover:scale-105 transition-transform" />
+                          {u.photoUrl ? (
+                            <Image src={u.photoUrl} width={64} height={64} className="w-16 h-16 rounded-2xl object-cover shadow-lg group-hover:scale-105 transition-transform" alt={`${u.firstName} ${u.lastName}`} />
+                          ) : (
+                            <div className="w-16 h-16 rounded-2xl bg-gray-100" />
+                          )}
                           <div>
                             <p className="font-black text-lg text-3d">{u.firstName} {u.lastName}</p>
                             <p className="text-[11px] opacity-40 font-mono tracking-tighter uppercase">{u.id} • {u.address}</p>
@@ -416,7 +421,11 @@ const Programs: React.FC = () => {
                             className="p-8 bg-white dark:bg-alaga-navy/20 rounded-[32px] border border-gray-100 dark:border-white/5 flex items-center justify-between group transition-all cursor-pointer inflated-card border-transparent hover:border-alaga-blue"
                         >
                             <div className="flex items-center gap-6">
-                                <img src={user?.photoUrl} className="w-16 h-16 rounded-2xl object-cover shadow-xl" alt="" />
+                                {user?.photoUrl ? (
+                                  <Image src={user.photoUrl} width={64} height={64} className="w-16 h-16 rounded-2xl object-cover shadow-xl" alt={`${user?.firstName} ${user?.lastName}`} />
+                                ) : (
+                                  <div className="w-16 h-16 rounded-2xl bg-gray-100" />
+                                )}
                                 <div>
                                     <p className="font-black text-lg text-3d">{user?.firstName} {user?.lastName}</p>
                                     <p className="text-[10px] opacity-40 uppercase font-black tracking-[0.2em]">{req.dateApplied} • {req.id}</p>

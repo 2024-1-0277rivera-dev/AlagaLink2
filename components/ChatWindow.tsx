@@ -6,7 +6,6 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import { 
-  MOCK_USERS, 
   MOCK_REPORTS, 
   MOCK_DEVICES, 
   MOCK_MEDICAL, 
@@ -32,8 +31,8 @@ interface ChatWindowProps {
   isEmbedded?: boolean;
 }
 
-const ChatWindow: React.FC<ChatWindowProps> = ({ onClose, targetUser, onBackToList, anchorPosition, isEmbedded = false }) => {
-  const { currentUser, setSearchSignal, isDarkMode, directMessages, sendDirectMessage, users } = useAppContext();
+const ChatWindow: React.FC<ChatWindowProps> = ({ targetUser, anchorPosition, isEmbedded = false }) => {
+  const { currentUser, setSearchSignal, directMessages, sendDirectMessage, users } = useAppContext();
   const isAdmin = currentUser?.role === 'Admin' || currentUser?.role === 'SuperAdmin';
   
   const isAiSelected = isAdmin && !targetUser;
@@ -262,7 +261,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onClose, targetUser, onBackToLi
             {parts.map((part, i) => {
               const match = part.match(/\[\[(.*?)\|(.*?)\|(.*?)\]\]/);
               if (match) {
-                const [_, name, id, type] = match;
+                const [, name, id, type] = match;
                 const registryItem = municipalRegistry.find(ri => ri.id === id);
                 const chipColor = type === 'Page' ? 'bg-alaga-gold/20 text-alaga-navy dark:text-alaga-gold border-alaga-gold/30' : 
                                  type === 'Item' ? 'bg-alaga-blue/10 text-alaga-blue border-alaga-blue/20' :
@@ -375,7 +374,11 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onClose, targetUser, onBackToLi
           className="fixed z-[200] w-48 bg-white dark:bg-alaga-charcoal rounded-2xl shadow-2xl border border-gray-100 dark:border-white/10 overflow-hidden pointer-events-none animate-in fade-in zoom-in-95 duration-200"
           style={{ left: `${hoverData.x}px`, top: `${hoverData.y}px` }}
         >
-          <img src={hoverData.image} className="w-full h-24 object-cover" alt="" />
+            {hoverData.image ? (
+              <Image src={hoverData.image} width={230} height={96} className="w-full h-24 object-cover" alt={hoverData.title} />
+            ) : (
+              <div className="w-full h-24 bg-gray-100" />
+            )}
           <div className="p-3">
             <p className="font-black text-[10px] truncate">{hoverData.title}</p>
             <p className="text-[8px] opacity-40 uppercase tracking-widest font-bold mt-1">Click to Navigate</p>

@@ -1,4 +1,4 @@
-import { UserProfile, DisabilityCategory } from '../types';
+import { UserProfile } from '../types';
 import { MOCK_REGISTERED } from './members/registered';
 
 // We now import from the source of truth to ensure consistency

@@ -6,7 +6,6 @@ import ImageInput from '../shared/ImageInput';
 import { MUNICIPAL_ASSETS } from '../../mockData/assets';
 
 interface RegistrationWorkflowProps {
-  customSections: Array<Record<string, unknown>>;
   onSubmit: (data: Partial<UserProfile>, family: FamilyMember[]) => boolean | Promise<boolean | { success: boolean; message?: string } | void>;
   onCancel?: () => void;
   initialData?: Partial<UserProfile>;
@@ -14,7 +13,6 @@ interface RegistrationWorkflowProps {
 }
 
 const RegistrationWorkflow: React.FC<RegistrationWorkflowProps> = ({ 
-  customSections, 
   onSubmit, 
   onCancel, 
   initialData, 

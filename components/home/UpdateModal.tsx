@@ -1,5 +1,6 @@
 
 import React from 'react';
+import Image from 'next/image';
 import { useAppContext } from '../../context/AppContext';
 
 type UpdateItem = {
@@ -49,10 +50,11 @@ const UpdateModal: React.FC<UpdateModalProps> = ({ update, onClose, onNavigate }
         </button>
         
         <div className="h-56 overflow-hidden relative">
-          <img 
+          <Image 
             src={update.photoUrl || `https://picsum.photos/seed/${update.id}/800/400`} 
-            className="w-full h-full object-cover" 
-            alt={update.title} 
+            alt={update.title}
+            fill
+            className="object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-alaga-charcoal/80 to-transparent"></div>
           

@@ -151,7 +151,6 @@ const InventoryPortal: React.FC<InventoryPortalProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
               {items.map(item => {
                 const approvedParticipants = requests.filter(r => r.programType === type && r.requestedItemId === item.id && (r.status === 'Approved' || r.status === 'Completed'));
-                const unreadRequestsForItem = requests.filter(r => r.programType === type && r.requestedItemId === item.id && notifications.some(n => n.link && n.link.endsWith(r.id) && !n.isRead)).length;
                 return (
                   <div key={item.id} onClick={() => { if (type === 'Livelihood') setSelectedLivelihood(item); if (type === 'Medical') setSelectedMedical(item); if (type === 'Device') setSelectedDevice(item); }} className={`bg-white dark:bg-alaga-navy/20 rounded-[16px] overflow-hidden border transition-all cursor-pointer hover:shadow-xl ${!item.isVisible ? 'opacity-50 grayscale' : 'border-gray-100 dark:border-white/5 hover:border-alaga-blue'}`}>
                     <div className="flex flex-col">
@@ -222,7 +221,6 @@ const InventoryPortal: React.FC<InventoryPortalProps> = ({
               {(() => {
                 const item = selectedLivelihood || selectedMedical || selectedDevice;
                 if (!item) return null;
-                const unreadRequestsForItem = requests.filter(r => r.requestedItemId === item.id && notifications.some(n => n.link && n.link.endsWith(r.id) && !n.isRead)).length;
                 const title = item.title || item.name;
                 const overview = item.overview || item.description;
                 const skillLabel = type === 'Medical' ? 'Requirements & Focus' : type === 'Device' ? 'Eligibility & Requirements' : 'Skill Set Gained';
@@ -282,7 +280,7 @@ interface InventoryCardProps {
 } 
 
 const InventoryCard: React.FC<InventoryCardProps> = ({ item, type, onApply, requests, notifications }) => {
-  const [imageError, setImageError] = useState(false);
+  const [imageError] = useState(false);
   const unreadRequestsForItem = requests.filter(r => r.programType === type && r.requestedItemId === item.id && notifications.some(n => n.link && n.link.endsWith(r.id) && !n.isRead)).length;
 
   return (
@@ -295,18 +293,8 @@ const InventoryCard: React.FC<InventoryCardProps> = ({ item, type, onApply, requ
           </div>
         ) : (
           <>
-            <img 
-              src={item.photoUrl} 
-              className="absolute inset-0 w-full h-full object-cover blur-lg opacity-30 scale-110" 
-              alt="" 
-              onError={() => setImageError(true)}
-            />
-            <img 
-              src={item.photoUrl} 
-              className="relative w-full h-full object-cover group-hover:scale-105 transition-all duration-700 will-change-transform" 
-              alt={item.name || item.title}
-              onError={() => setImageError(true)}
-            />
+            <Image src={item.photoUrl} width={640} height={192} className="absolute inset-0 w-full h-full object-cover blur-lg opacity-30 scale-110" alt="" />
+            <Image src={item.photoUrl} width={640} height={192} className="relative w-full h-full object-cover group-hover:scale-105 transition-all duration-700 will-change-transform" alt={item.name || item.title} />
           </>
         )}
         <div className="absolute top-4 left-4 bg-alaga-navy/60 backdrop-blur-md px-3 py-1 rounded-full text-[9px] font-black text-white uppercase tracking-widest z-10">{item.category}</div>
@@ -331,9 +319,6 @@ const InventoryCard: React.FC<InventoryCardProps> = ({ item, type, onApply, requ
   );
 };
 
-const InventoryPortalOld = () => {
-  // Legacy view retained for reference – intentionally returns null in production builds.
-  return null;
-};
+
 
 export default InventoryPortal;

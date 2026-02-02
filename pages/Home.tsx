@@ -204,8 +204,13 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
 
   const handleStatNavigate = (link: string) => {
     if (link === 'pending-choice') setShowPendingOptions(true);
-    else if (link === 'registered-choice') isSuperAdmin ? setShowRegisteredOptions(true) : (setSearchSignal({ page: 'members', section: 'PWD' }), onNavigate('members'));
-    else onNavigate(link);
+    else if (link === 'registered-choice') {
+      if (isSuperAdmin) setShowRegisteredOptions(true);
+      else {
+        setSearchSignal({ page: 'members', section: 'PWD' });
+        onNavigate('members');
+      }
+    } else onNavigate(link);
   };
 
   const handleRegisteredChoice = (section: string) => {

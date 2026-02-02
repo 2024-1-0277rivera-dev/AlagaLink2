@@ -1,5 +1,6 @@
 
 import React, { useMemo } from 'react';
+import Image from 'next/image';
 import { useAppContext } from '../context/AppContext';
 
 const RoleSwitcherModal: React.FC = () => {
@@ -46,7 +47,11 @@ const RoleSwitcherModal: React.FC = () => {
                      onClick={() => loginById(admin.id)}
                      className="flex items-center gap-4 p-4 bg-alaga-navy text-white rounded-2xl hover:scale-[1.02] active:scale-95 transition-all group"
                    >
-                     <img src={admin.photoUrl} className="w-12 h-12 rounded-xl object-cover border-2 border-alaga-gold/50" alt="" />
+                     {admin.photoUrl ? (
+                       <Image src={admin.photoUrl} width={48} height={48} className="w-12 h-12 rounded-xl object-cover border-2 border-alaga-gold/50" alt={`${admin.firstName} ${admin.lastName}`} />
+                     ) : (
+                       <div className="w-12 h-12 rounded-xl bg-gray-100 border-2 border-alaga-gold/50" />
+                     )}
                      <div className="text-left">
                         <p className="font-black text-base leading-tight">{admin.firstName} {admin.lastName}</p>
                         <p className="text-[9px] text-alaga-gold uppercase font-black tracking-tighter">Executive</p>
@@ -70,7 +75,11 @@ const RoleSwitcherModal: React.FC = () => {
                      onClick={() => loginById(admin.id)}
                      className="flex items-center gap-3 p-3 bg-alaga-gray dark:bg-alaga-navy/40 rounded-2xl border border-gray-100 dark:border-white/5 hover:border-red-500 transition-all group"
                    >
-                     <img src={admin.photoUrl} className="w-10 h-10 rounded-xl object-cover grayscale group-hover:grayscale-0 transition-all" alt="" />
+                     {admin.photoUrl ? (
+                       <Image src={admin.photoUrl} width={40} height={40} className="w-10 h-10 rounded-xl object-cover grayscale group-hover:grayscale-0 transition-all" alt={`${admin.firstName} ${admin.lastName}`} />
+                     ) : (
+                       <div className="w-10 h-10 rounded-xl bg-gray-100" />
+                     )}
                      <div className="text-left">
                         <p className="font-bold text-xs leading-tight truncate max-w-[100px]">{admin.firstName} {admin.lastName}</p>
                         <p className="text-[8px] opacity-40 uppercase font-black">Staff</p>
@@ -93,7 +102,11 @@ const RoleSwitcherModal: React.FC = () => {
                      onClick={() => loginById(user.id)}
                      className="flex flex-col items-center p-3 bg-white dark:bg-alaga-navy/20 rounded-2xl border border-gray-100 dark:border-white/5 hover:border-alaga-blue hover:shadow-lg transition-all group text-center"
                    >
-                     <img src={user.photoUrl} className="w-12 h-12 rounded-full object-cover mb-2 group-hover:scale-110 transition-transform" alt="" />
+                     {user.photoUrl ? (
+                       <Image src={user.photoUrl} width={48} height={48} className="w-12 h-12 rounded-full object-cover mb-2 group-hover:scale-110 transition-transform" alt={`${user.firstName} ${user.lastName}`} />
+                     ) : (
+                       <div className="w-12 h-12 rounded-full bg-gray-100 mb-2" />
+                     )}
                      <p className="font-black text-[9px] leading-tight mb-1 truncate w-full">{user.firstName} {user.lastName}</p>
                      <p className="text-[7px] opacity-40 uppercase font-bold">{user.disabilityCategory.split(' ')[0]}</p>
                    </button>

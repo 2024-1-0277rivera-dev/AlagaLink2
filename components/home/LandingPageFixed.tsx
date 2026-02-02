@@ -474,8 +474,11 @@ const LandingPage: React.FC = () => {
 
               {selectedService.id === 'medical' && MOCK_MEDICAL.map((m: MedicalService) => (
                 <div key={m.id} className="flex items-center gap-4 p-3 rounded-lg border border-gray-100">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={m.photoUrl || ''} alt={m.name} className="w-16 h-12 object-cover rounded" />
+                  {m.photoUrl ? (
+                    <Image src={m.photoUrl} width={64} height={48} alt={m.name} className="w-16 h-12 object-cover rounded" />
+                  ) : (
+                    <div className="w-16 h-12 rounded bg-gray-100" aria-hidden />
+                  )}
                   <div className="flex-1">
                     <div className="font-black">{m.name}</div>
                     <div className="text-xs opacity-60">{m.assistanceDetail || m.overview || ''}</div>
@@ -486,8 +489,11 @@ const LandingPage: React.FC = () => {
 
               {selectedService.id === 'livelihood' && MOCK_LIVELIHOODS.map((l: LivelihoodProgram) => (
                 <div key={l.id} className="flex items-center gap-4 p-3 rounded-lg border border-gray-100">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={l.photoUrl || ''} alt={l.photoAlt || l.title} className="w-16 h-12 object-cover rounded" />
+                  {l.photoUrl ? (
+                    <Image src={l.photoUrl} width={64} height={48} alt={l.photoAlt || l.title} className="w-16 h-12 object-cover rounded" />
+                  ) : (
+                    <div className="w-16 h-12 rounded bg-gray-100" aria-hidden />
+                  )}
                   <div className="flex-1">
                     <div className="font-black">{l.title}</div>
                     <div className="text-xs opacity-60">{(l as unknown as { desc?: string; description?: string }).desc || (l as unknown as { desc?: string; description?: string }).description || l.overview || ''}</div>

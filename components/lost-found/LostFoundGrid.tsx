@@ -1,5 +1,6 @@
 
 import React from 'react';
+import Image from 'next/image';
 import { LostReport } from '../../types';
 
 interface LostFoundGridProps {
@@ -27,10 +28,11 @@ const LostFoundGrid: React.FC<LostFoundGridProps> = ({ reports, onSelect }) => {
             className="bg-white dark:bg-alaga-charcoal rounded-[20px] md:rounded-[24px] overflow-hidden shadow-sm hover:shadow-xl transition-all border border-gray-100 dark:border-white/5 cursor-pointer group flex flex-col h-full"
           >
             <div className="h-44 md:h-52 relative overflow-hidden shrink-0 bg-alaga-gray dark:bg-alaga-navy">
-              <img 
-                src={report.photoUrl || `https://picsum.photos/seed/${report.id}/500/500`} 
-                className="relative w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
-                alt={report.name} 
+              <Image
+                src={report.photoUrl || `https://picsum.photos/seed/${report.id}/500/500`}
+                alt={report.name}
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-700"
               />
               <div className={`absolute top-3 right-3 px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest shadow-lg z-10 ${isFound ? 'bg-alaga-teal text-white' : 'bg-red-500 text-white animate-pulse'}`}>
                 {report.status}

@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { ProgramAvailment } from '../../types';
-import { useAppContext, Notification } from '../../context/AppContext';
+import { useAppContext } from '../../context/AppContext';
 
 interface ProfileHistoryProps {
   history: ProgramAvailment[];

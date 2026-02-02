@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
 import ChatWindow from './ChatWindow';
 import { useAppContext } from '@/context/AppContext';
 import { UserProfile } from '@/lib/types';
@@ -98,7 +99,7 @@ const FloatingAssistiveButton: React.FC = () => {
     };
   }, [isDragging]);
 
-  const toggleAction = (e: React.MouseEvent) => {
+  const toggleAction = () => {
     // If the mouse up followed a drag, don't open the chat
     if (dragOccurred.current) return;
 
@@ -185,7 +186,6 @@ const FloatingAssistiveButton: React.FC = () => {
       {showAdminHub && isAdmin && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-8 bg-alaga-navy/60 backdrop-blur-md animate-in fade-in duration-300">
 
-
           <div 
             className="w-full max-w-6xl h-[85vh] bg-white dark:bg-alaga-charcoal shadow-[0_40px_100px_rgba(0,0,0,0.5)] rounded-[40px] flex flex-row border border-white/10 overflow-hidden animate-in zoom-in-95 duration-500 relative"
           >
@@ -210,7 +210,11 @@ const FloatingAssistiveButton: React.FC = () => {
                         const staff = users.find(us => us.id === lastStaff.senderId);
                         return (
                           <div className="flex items-center gap-2">
-                            <img src={staff?.photoUrl} className="w-8 h-8 rounded-xl object-cover shadow-sm" />
+                            {staff?.photoUrl ? (
+                              <Image src={staff.photoUrl} width={32} height={32} className="w-8 h-8 rounded-xl object-cover shadow-sm" alt={staff?.firstName} />
+                            ) : (
+                              <div className="w-8 h-8 rounded-xl bg-gray-100" />
+                            )}
                             <div className="text-xs font-black uppercase">Handled by <span className="ml-1 text-alaga-blue">{staff?.firstName}</span></div>
                           </div>
                         );
@@ -260,7 +264,7 @@ const FloatingAssistiveButton: React.FC = () => {
               <div className="flex-1 px-4 pb-4 overflow-hidden flex flex-col">
                 <div className="flex-1 bg-white dark:bg-alaga-navy/20 rounded-[32px] border border-gray-100 dark:border-white/5 overflow-hidden flex flex-col shadow-inner">
                   <div className="flex-1 overflow-y-auto no-scrollbar py-2">
-                    {filteredUsers.length > 0 ? filteredUsers.map((u, i) => {
+                    {filteredUsers.length > 0 ? filteredUsers.map((u) => {
                       const isSelected = activeChatUser?.id === u.id;
                       return (
                         <button 
@@ -274,7 +278,11 @@ const FloatingAssistiveButton: React.FC = () => {
                           `}
                         >
                           <div className="relative shrink-0">
-                            <img src={u.photoUrl} className={`w-10 h-10 rounded-xl object-cover shadow-sm border-2 ${isSelected ? 'border-white/30' : 'border-white dark:border-white/10'}`} alt="" />
+                              {u.photoUrl ? (
+                                <Image src={u.photoUrl} width={40} height={40} className={`w-10 h-10 rounded-xl object-cover shadow-sm border-2 ${isSelected ? 'border-white/30' : 'border-white dark:border-white/10'}`} alt={`${u.firstName} ${u.lastName}`} />
+                              ) : (
+                                <div className="w-10 h-10 rounded-xl bg-gray-100" />
+                              )}
                           </div>
                           <div className="text-left flex-1 min-w-0">
                             <p className={`font-black text-xs truncate ${isSelected ? 'text-white' : ''}`}>{u.firstName} {u.lastName}</p>

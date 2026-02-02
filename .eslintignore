@@ -1,9 +1,0 @@
-# Ignore build artifacts and deps
-.next
-my-next-app/.next
-node_modules
-.vscode
-dist
-coverage
-tsconfig.tsbuildinfo
-**/*.d.ts

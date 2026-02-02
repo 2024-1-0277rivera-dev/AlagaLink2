@@ -8,15 +8,13 @@ interface ImageInputProps {
   onChange: (newValue: string) => void;
   label?: string;
   aspect?: 'square' | 'video';
-  themeColor?: string;
 }
 
 const ImageInput: React.FC<ImageInputProps> = ({ 
   value, 
   onChange, 
   label = "Asset Image", 
-  aspect = 'square',
-  themeColor = 'alaga-blue'
+  aspect = 'square'
 }) => {
   const [mode, setMode] = useState<'URL' | 'Upload'>('URL');
   const [isDragging, setIsDragging] = useState(false);
@@ -60,7 +58,7 @@ const ImageInput: React.FC<ImageInputProps> = ({
         return `https://graph.facebook.com/${candidate}/picture?type=large`;
       }
       return raw;
-    } catch (err) {
+    } catch {
       return raw;
     }
   };
@@ -84,7 +82,7 @@ const ImageInput: React.FC<ImageInputProps> = ({
         setImageError('');
         return true;
       }
-    } catch (err) {
+    } catch {
       // head request failed, fall back to image test
     }
 
@@ -122,7 +120,7 @@ const ImageInput: React.FC<ImageInputProps> = ({
         setImageError('');
         return;
       }
-    } catch (err) {
+    } catch {
       // fallthrough to error below
     }
 

@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { AppProvider, useAppContext } from './context/AppContext';
+import { AppProvider } from './context/AppContext';
 import Navbar from './components/Navbar';
 import FloatingAssistiveButton from './components/FloatingAssistiveButton';
 import RoleSwitcherModal from './components/RoleSwitcherModal';

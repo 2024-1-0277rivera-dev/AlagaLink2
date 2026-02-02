@@ -1,10 +1,10 @@
 
 'use client';
 import React, { useState, useMemo } from 'react';
+import Image from 'next/image';
 import { useAppContext } from '../../context/AppContext';
 import { UserProfile, LostReport } from '../../types';
 import ImageInput from '../shared/ImageInput';
-import { MUNICIPAL_ASSETS } from '../../mockData/assets';
 
 interface ReportMissingWizardProps {
   onClose: () => void;
@@ -122,7 +122,11 @@ const ReportMissingWizard: React.FC<ReportMissingWizardProps> = ({ onClose, onNa
                             className="p-4 bg-white dark:bg-alaga-navy/20 rounded-[20px] border border-gray-100 dark:border-white/5 flex items-center justify-between cursor-pointer hover:border-red-500 hover:shadow-xl transition-all group"
                           >
                             <div className="flex items-center gap-4">
-                               <img src={u.photoUrl} className="w-12 h-12 rounded-2xl object-cover border-2 border-white shadow-sm" alt="" />
+                               {u.photoUrl ? (
+                                 <Image src={u.photoUrl} width={48} height={48} className="w-12 h-12 rounded-2xl object-cover border-2 border-white shadow-sm" alt={`${u.firstName} ${u.lastName}`} />
+                               ) : (
+                                 <div className="w-12 h-12 rounded-2xl bg-gray-100 border-2 border-white shadow-sm" />
+                               )}
                                <div>
                                   <p className="font-black text-sm">{u.firstName} {u.lastName}</p>
                                   <p className="text-[9px] font-mono opacity-40 uppercase">{u.id}</p>
@@ -146,7 +150,11 @@ const ReportMissingWizard: React.FC<ReportMissingWizardProps> = ({ onClose, onNa
           ) : (
             <form onSubmit={handleFinalSubmit} className="space-y-10 animate-in slide-in-from-right-4 duration-500 pb-10">
                <div className="flex flex-col md:flex-row gap-6 items-center bg-alaga-blue/5 p-6 rounded-[24px] border border-alaga-blue/10">
-                  <img src={selectedUser?.photoUrl} className="w-24 h-24 rounded-[20px] object-cover shadow-2xl border-4 border-white shrink-0" alt="" />
+                  {selectedUser?.photoUrl ? (
+                    <Image src={selectedUser.photoUrl} width={96} height={96} className="w-24 h-24 rounded-[20px] object-cover shadow-2xl border-4 border-white shrink-0" alt={`${selectedUser?.firstName} ${selectedUser?.lastName}`} />
+                  ) : (
+                    <div className="w-24 h-24 rounded-[20px] bg-gray-100 shadow-2xl border-4 border-white shrink-0" />
+                  )}
                   <div>
                     <h4 className="text-2xl font-black text-alaga-blue">{selectedUser?.firstName} {selectedUser?.lastName}</h4>
                     <p className="text-[9px] font-black uppercase tracking-widest opacity-40 mb-2">Registry ID: {selectedUser?.id}</p>

@@ -233,7 +233,6 @@ const Members: React.FC = () => {
         <div className="py-4 animate-in zoom-in-95 duration-500">
           <RegistrationWorkflow 
             key={`${activeGroup}-${activeTab}`}
-            customSections={customSections} 
             onSubmit={handleRegisterSubmit}
             onCancel={() => setActiveTab('Registered')}
             initialData={activeGroup === 'Staff' ? { role: 'Admin', registrantType: 'PDAO Staff', disabilityCategory: DisabilityCategory.None } : { role: 'User', registrantType: 'Self', disabilityCategory: DisabilityCategory.Autism }}

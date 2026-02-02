@@ -1,7 +1,8 @@
 
 'use client';
 import React from 'react';
-import { LostReport, UserProfile } from '../../types';
+import Image from 'next/image';
+import { LostReport } from '../../types';
 import { useAppContext } from '../../context/AppContext';
 
 interface CaseDetailModalProps {
@@ -32,10 +33,11 @@ const CaseDetailModal: React.FC<CaseDetailModalProps> = ({ report, onClose }) =>
         
         {/* Left Side: Photo & Quick Status */}
         <div className="md:w-5/12 relative h-64 md:h-auto shrink-0 group">
-          <img 
-            src={report.photoUrl || subjectUser?.photoUrl || `https://picsum.photos/seed/${report.id}/800/800`} 
-            className="w-full h-full object-cover" 
-            alt={report.name} 
+          <Image
+            src={report.photoUrl || subjectUser?.photoUrl || `https://picsum.photos/seed/${report.id}/800/800`}
+            alt={report.name}
+            fill
+            className="object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
           

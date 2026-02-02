@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { UserProfile } from '../../types';
 
 interface DigitalIdCardProps { user: UserProfile; }
@@ -42,7 +43,7 @@ const DigitalIdCard: React.FC<DigitalIdCardProps> = ({ user }) => {
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <div className="w-9 h-9 flex items-center justify-center bg-white rounded-lg p-1 shadow-md">
-                  <img src="https://images.unsplash.com/photo-1599305090598-fe179d501227?q=80&w=200&h=200&fit=crop" className="h-full object-contain" alt="Municipal Seal" />
+                  <Image src="https://images.unsplash.com/photo-1599305090598-fe179d501227?q=80&w=200&h=200&fit=crop" alt="Municipal Seal" width={36} height={36} className="h-full object-contain" />
                 </div>
                 <div className="leading-none">
                   <p className="text-[5.5px] font-black uppercase tracking-[0.15em] opacity-60">Republic of the Philippines</p>
@@ -62,7 +63,7 @@ const DigitalIdCard: React.FC<DigitalIdCardProps> = ({ user }) => {
               {/* Photo Area */}
               <div className="col-span-3 flex flex-col justify-center items-center">
                 <div className="aspect-[25/30] w-full bg-alaga-navy/40 border-[1pt] border-white/20 rounded shadow-2xl overflow-hidden relative">
-                  <img src={user.photoUrl} className="w-full h-full object-cover" alt={user.firstName} />
+                  <Image src={user.photoUrl} alt={user.firstName} fill className="object-cover" />
                   <div className="absolute inset-0 shadow-[inset_0_0_15px_rgba(0,0,0,0.2)]"></div>
                 </div>
                 <div className="mt-1 flex gap-1 opacity-40">
@@ -153,10 +154,12 @@ const DigitalIdCard: React.FC<DigitalIdCardProps> = ({ user }) => {
                  {/* QR Code Section */}
                  <div className="col-span-5 flex flex-col items-center gap-2">
                     <div className="p-1.5 bg-white border border-alaga-blue/20 rounded-[14px] shadow-xl">
-                       <img 
-                          src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${qrCodeValue}&bgcolor=ffffff&color=2546F0`} 
-                          className="w-[26mm] h-[26mm] object-contain" 
-                          alt="Verification QR" 
+                       <Image
+                          src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${qrCodeValue}&bgcolor=ffffff&color=2546F0`}
+                          width={150}
+                          height={150}
+                          alt="Verification QR"
+                          className="object-contain"
                        />
                     </div>
                     <p className="text-[6pt] font-black text-alaga-blue text-center uppercase tracking-tighter leading-tight opacity-60">

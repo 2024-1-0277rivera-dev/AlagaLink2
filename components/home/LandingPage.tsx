@@ -8,14 +8,13 @@ import { MOCK_DEVICES, MOCK_MEDICAL, MOCK_LIVELIHOODS } from '../../mockData/ind
 type ApplyTarget = { sentinelServiceId?: string; title?: string; id?: string; requestedItemId?: string; name?: string } | null;
 
 const LandingPage: React.FC = () => {
-  const { currentUser, login, loginWithPassword, users, addUser, loginById, addProgramRequest, searchSignal, setSearchSignal, notifications } = useAppContext();
+  const { currentUser, loginWithPassword, addUser, loginById, addProgramRequest, searchSignal, setSearchSignal, notifications } = useAppContext();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showSignupPopover, setShowSignupPopover] = useState(false);
   const [showLoginPopover, setShowLoginPopover] = useState(false);
   const [activeRegistration, setActiveRegistration] = useState<'User' | 'Staff' | null>(null);
   const [showPWDIDPopover, setShowPWDIDPopover] = useState(false);
-  const [error, setError] = useState('');
   const [loginError, setLoginError] = useState('');
 
   const programsRef = useRef<HTMLDivElement>(null);
@@ -41,7 +40,6 @@ const LandingPage: React.FC = () => {
   };
 
   const handleRegister = (formData: Partial<UserProfile>) => {
-    /* eslint-disable-next-line react-hooks/purity -- id generation for new users is safe in an event handler */
     const newId = activeRegistration === 'Staff' ? `ADM-LT-${Date.now()}` : `LT-PWD-${Date.now()}`;
     const newUser: UserProfile = {
       ...(formData as UserProfile),
@@ -52,7 +50,6 @@ const LandingPage: React.FC = () => {
     addUser(newUser);
     // Create an initial program request for ID issuance so the user appears in pending area
     const newReq: ProgramAvailment = {
-      /* eslint-disable-next-line react-hooks/purity -- id generation for new requests is safe in an event handler */
       id: `req-${Date.now()}`,
       userId: newId,
       programType: 'ID',
@@ -129,7 +126,7 @@ const LandingPage: React.FC = () => {
     setShowApplyPopover(false);
     setShowServicePopover(false);
     setApplyTarget(null);
-  }, [currentUser, applyTarget, selectedService]);
+  }, [currentUser, applyTarget, selectedService, addProgramRequest]);
 
   const openService = (id: string, title: string, desc: string) => {
     setSelectedService({ id, title, desc });
@@ -150,7 +147,7 @@ const LandingPage: React.FC = () => {
   };
 
   // Simple notification indicators for Programs & Services
-  const programsNotifCount = notifications.filter(n => n.link && n.link.startsWith('programs')).length;
+
   const idNotif = notifications.some(n => n.programType === 'ID' || (n.link && n.link.startsWith('programs:ID')));
   const assistiveNotif = notifications.some(n => n.programType === 'Device' || (n.link && n.link.includes('requests') && n.programType === 'Device'));
   const medicalNotif = notifications.some(n => n.programType === 'Medical' || (n.link && n.link.includes('requests') && n.programType === 'Medical'));
@@ -504,7 +501,11 @@ const LandingPage: React.FC = () => {
 
               {selectedService.id === 'medical' && MOCK_MEDICAL.map((m: MedicalService) => (
                 <div key={m.id} className="flex items-center gap-4 p-3 rounded-lg border border-gray-100">
-                  <img src={m.photoUrl || ''} alt={m.name} className="w-16 h-12 object-cover rounded" />
+                  {m.photoUrl ? (
+                    <Image src={m.photoUrl} width={64} height={48} alt={m.name} className="w-16 h-12 object-cover rounded" />
+                  ) : (
+                    <div className="w-16 h-12 rounded bg-gray-100" aria-hidden />
+                  )}
                   <div className="flex-1">
                     <div className="font-black">{m.name}</div>
                     <div className="text-xs opacity-60">{m.assistanceDetail || m.overview || ''}</div>
@@ -515,7 +516,11 @@ const LandingPage: React.FC = () => {
 
               {selectedService.id === 'livelihood' && MOCK_LIVELIHOODS.map((l: LivelihoodProgram) => (
                 <div key={l.id} className="flex items-center gap-4 p-3 rounded-lg border border-gray-100">
-                  <img src={l.photoUrl || ''} alt={l.photoAlt || l.title} className="w-16 h-12 object-cover rounded" />
+                  {l.photoUrl ? (
+                    <Image src={l.photoUrl} width={64} height={48} alt={l.photoAlt || l.title} className="w-16 h-12 object-cover rounded" />
+                  ) : (
+                    <div className="w-16 h-12 rounded bg-gray-100" aria-hidden />
+                  )}
                   <div className="flex-1">
                     <div className="font-black">{l.title}</div>
                     <div className="text-xs opacity-60">{(l as unknown as { desc?: string; description?: string }).desc || (l as unknown as { desc?: string; description?: string }).description || l.overview || ''}</div>

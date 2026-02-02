@@ -1,5 +1,6 @@
 
 import React, { useState, useMemo } from 'react';
+import Image from 'next/image';
 
 type UpdateItem = {
   id: string;
@@ -103,7 +104,11 @@ const HomeNews: React.FC<HomeNewsProps> = ({ updates = [], onSelect, isAdmin = f
                 </h4>
               </div>
               <div className="aspect-[16/9] overflow-hidden grayscale hover:grayscale-0 transition-all duration-700">
-                <img src={filteredItems[0].photoUrl} className="w-full h-full object-cover" alt="" />
+                {filteredItems[0].photoUrl ? (
+                  <Image src={filteredItems[0].photoUrl} width={1280} height={720} className="w-full h-full object-cover" alt={filteredItems[0].title} />
+                ) : (
+                  <div className="w-full h-full bg-gray-100" />
+                )}
               </div>
               <p className="text-lg font-medium leading-tight text-gray-700 dark:text-gray-300 first-letter:text-5xl first-letter:font-black first-letter:mr-2 first-letter:float-left text-justify">
                 {filteredItems[0].summary}
@@ -135,7 +140,11 @@ const HomeNews: React.FC<HomeNewsProps> = ({ updates = [], onSelect, isAdmin = f
                     </p>
                   </div>
                   <div className="w-24 h-24 shrink-0 overflow-hidden grayscale group-hover:grayscale-0 transition-all">
-                    <img src={item.photoUrl} className="w-full h-full object-cover" alt="" />
+                    {item.photoUrl ? (
+                      <Image src={item.photoUrl} width={96} height={96} className="w-full h-full object-cover" alt={item.title} />
+                    ) : (
+                      <div className="w-full h-full bg-gray-100" />
+                    )}
                   </div>
                 </div>
               </div>
@@ -153,7 +162,11 @@ const HomeNews: React.FC<HomeNewsProps> = ({ updates = [], onSelect, isAdmin = f
                     className="group cursor-pointer space-y-3"
                   >
                     <div className="aspect-video w-full overflow-hidden grayscale group-hover:grayscale-0 transition-all border border-gray-100 dark:border-white/5">
-                      <img src={item.photoUrl} className="w-full h-full object-cover" alt="" />
+                      {item.photoUrl ? (
+                        <Image src={item.photoUrl} width={320} height={180} className="w-full h-full object-cover" alt={item.title} />
+                      ) : (
+                        <div className="w-full h-full bg-gray-100" />
+                      )}
                     </div>
                     <div className="space-y-1">
                       <p className={`text-[8px] uppercase tracking-[0.2em] ${getBadgeStyle(item.type)}`}>{item.category}</p>

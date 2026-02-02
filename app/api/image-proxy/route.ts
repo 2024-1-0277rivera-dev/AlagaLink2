@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
     let parsed: URL;
     try {
       parsed = new URL(url);
-    } catch (err) {
+    } catch {
       return NextResponse.json({ error: 'Invalid URL' }, { status: 400 });
     }
 

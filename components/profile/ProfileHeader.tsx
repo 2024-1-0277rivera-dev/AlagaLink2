@@ -1,6 +1,7 @@
 
 'use client';
 import React from 'react';
+import Image from 'next/image';
 import { UserProfile } from '../../types';
 import { useAppContext } from '../../context/AppContext';
 
@@ -28,10 +29,12 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user }) => {
               <div className="absolute inset-0 rounded-full bg-alaga-blue/20 blur-3xl group-hover:bg-alaga-teal/30 transition-colors duration-700"></div>
               
               <div className="relative p-3 bg-white dark:bg-alaga-charcoal rounded-full shadow-[0_40px_80px_-15px_rgba(0,0,0,0.4)] border-8 border-white dark:border-alaga-charcoal transform transition-transform duration-500 group-hover:scale-105">
-                <img 
+                <Image 
                   src={user.photoUrl} 
-                  className="w-48 h-48 rounded-full object-cover relative z-10 shadow-inner border-2 border-gray-100 dark:border-white/10" 
                   alt={user.firstName} 
+                  width={192}
+                  height={192}
+                  className="w-48 h-48 rounded-full object-cover relative z-10 shadow-inner border-2 border-gray-100 dark:border-white/10" 
                 />
                 
                 {/* Orbital Ring Decoration */}

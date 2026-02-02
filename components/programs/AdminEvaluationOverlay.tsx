@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import { ProgramAvailment, UserProfile, Narrative, DisabilityCategory } from '../../types';
 
 interface AdminEvaluationOverlayProps {
@@ -43,7 +44,7 @@ const AdminEvaluationOverlay: React.FC<AdminEvaluationOverlayProps> = ({ req, us
         {/* User Sidebar: Full Profile Visualization */}
         <div className="md:w-1/3 bg-alaga-gray dark:bg-alaga-navy/20 p-10 border-r border-gray-100 dark:border-white/5 overflow-y-auto no-scrollbar">
           <div className="text-center mb-8">
-            <img src={user?.photoUrl} className="w-40 h-40 rounded-[20px] mx-auto object-cover shadow-2xl border-4 border-white mb-6" alt="" />
+            <Image src={user?.photoUrl || ''} width={160} height={160} className="rounded-[20px] mx-auto object-cover shadow-2xl border-4 border-white mb-6" alt="" />
             <h4 className="text-3xl font-black leading-tight">{user?.firstName} {user?.lastName}</h4>
             <p className="text-[10px] font-mono opacity-40 tracking-widest mt-1 uppercase">PWD Registry ID: {user?.id}</p>
           </div>
@@ -149,7 +150,6 @@ const AdminEvaluationOverlay: React.FC<AdminEvaluationOverlayProps> = ({ req, us
                 </button>
                 <button 
                   onClick={() => {
-                    const why = (document.getElementById('eval-narrative') as HTMLTextAreaElement).value;
                     onReject(req.id, 'Rejected');
                   }} 
                   className="flex-1 bg-white dark:bg-alaga-charcoal text-red-500 border-2 border-red-500 py-6 rounded-[20px] font-black text-lg shadow-xl hover:bg-red-500 hover:text-white transition-all flex items-center justify-center gap-3"

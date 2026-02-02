@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 
 type UpdateItem = {
   id: string;
@@ -70,9 +71,10 @@ const HomeHero: React.FC<HomeHeroProps> = ({ updates, onClick }) => {
       onClick={() => onClick(currentUpdate)}
     >
       <div className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
-        <img 
-          src={currentUpdate.photoUrl || `https://picsum.photos/seed/hero-${currentUpdate.id}/1200/800`} 
-          alt={currentUpdate.title} 
+        <Image
+          src={currentUpdate.photoUrl || `https://picsum.photos/seed/hero-${currentUpdate.id}/1200/800`}
+          alt={currentUpdate.title}
+          fill
           className="w-full h-full object-cover object-center scale-100 transition-transform duration-[10s] group-hover:scale-110 will-change-transform"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-alaga-navy via-alaga-navy/60 to-transparent"></div>
