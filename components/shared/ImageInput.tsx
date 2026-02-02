@@ -79,10 +79,25 @@ const ImageInput: React.FC<ImageInputProps> = ({
     const ok = await testImageUrl(resolved);
     if (ok) {
       onChange(resolved);
-    } else {
-      // still allow using raw url but show error
-      onChange(resolved);
+      return;
     }
+
+    // If direct test failed, try using the server-side proxy to avoid CORS/private host issues
+    try {
+      const proxyUrl = `/api/image-proxy?url=${encodeURIComponent(resolved)}`;
+      const proxyOk = await testImageUrl(proxyUrl);
+      if (proxyOk) {
+        onChange(proxyUrl);
+        setImageError('');
+        return;
+      }
+    } catch (err) {
+      // fallthrough to error below
+    }
+
+    // still set the resolved value but surface an error so user can choose another image
+    onChange(resolved);
+    setImageError('Unable to fetch image directly. A proxy attempt was made and failed. Consider using a public CDN or upload the file.');
   };
 
 
