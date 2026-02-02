@@ -17,7 +17,7 @@ const ProfileHistory: React.FC<ProfileHistoryProps> = ({ history }) => {
         <div className="text-center py-20 bg-alaga-gray dark:bg-alaga-navy/10 rounded-[20px] border-2 border-dashed border-gray-200 dark:border-white/5">
           <i className="fa-solid fa-clock-rotate-left text-5xl opacity-20 mb-4"></i>
           <p className="opacity-40 font-bold">No programs or services availed yet.</p>
-          <p className="text-xs opacity-40 mt-2">Browse the Programs page to see what's available.</p>
+          <p className="text-xs opacity-40 mt-2">Browse the Programs page to see what is available.</p>
         </div>
       ) : (
         history.map((p, i) => (

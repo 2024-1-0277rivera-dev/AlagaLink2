@@ -49,12 +49,12 @@ const Navbar: React.FC<{ onNavigate: (page: string) => void, currentPage: string
 
   const isAdmin = currentUser?.role === 'Admin' || currentUser?.role === 'SuperAdmin';
 
-  const navItems = [
+  const navItems = useMemo(() => [
     { id: 'home', label: 'Home', icon: 'fa-house' },
     { id: 'programs', label: 'Programs', icon: 'fa-briefcase' },
     { id: 'lost-found', label: 'Lost & Found', icon: 'fa-magnifying-glass-location' },
     ...(isAdmin ? [{ id: 'members', label: 'Members', icon: 'fa-users' }] : [])
-  ];
+  ], [isAdmin]);
 
   const universalResults = useMemo(() => {
     if (!globalSearchQuery || globalSearchQuery.length < 2) return [];
@@ -118,7 +118,7 @@ const Navbar: React.FC<{ onNavigate: (page: string) => void, currentPage: string
     });
 
     return results.slice(0, 8);
-  }, [globalSearchQuery, reports, users, isAdmin]);
+  }, [globalSearchQuery, reports, users, navItems, isAdmin]);
 
   const handleResultClick = (res: SearchResult) => {
     setSearchSignal({ page: res.page, section: res.section, itemId: res.itemId });
