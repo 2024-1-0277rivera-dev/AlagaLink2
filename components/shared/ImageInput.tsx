@@ -19,6 +19,12 @@ const ImageInput: React.FC<ImageInputProps> = ({
 }) => {
   const [mode, setMode] = useState<'URL' | 'Upload'>('URL');
   const [isDragging, setIsDragging] = useState(false);
+  const [urlInput, setUrlInput] = useState<string>(value || '');
+  const [isTesting, setIsTesting] = useState(false);
+  const [imageError, setImageError] = useState<string>('');
+
+  // Keep local input in sync with prop value
+  React.useEffect(() => { setUrlInput(value || ''); setImageError(''); }, [value]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -27,6 +33,58 @@ const ImageInput: React.FC<ImageInputProps> = ({
       onChange(dataUrl);
     }
   };
+
+  // Transform facebook profile/page URLs into direct graph picture endpoints
+  const transformFacebookUrl = (raw: string) => {
+    try {
+      const u = new URL(raw);
+      if (!u.hostname.includes('facebook.com')) return raw;
+      // Example: https://www.facebook.com/username or profile.php?id=12345
+      if (u.pathname.includes('profile.php')) {
+        const id = u.searchParams.get('id');
+        if (id) return `https://graph.facebook.com/${id}/picture?type=large`;
+      }
+      const parts = u.pathname.split('/').filter(Boolean);
+      if (parts.length > 0) {
+        const candidate = parts[0];
+        return `https://graph.facebook.com/${candidate}/picture?type=large`;
+      }
+      return raw;
+    } catch (err) {
+      return raw;
+    }
+  };
+
+  const testImageUrl = (testUrl: string) => {
+    setIsTesting(true);
+    setImageError('');
+    return new Promise<boolean>((resolve) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => { setIsTesting(false); setImageError(''); resolve(true); };
+      img.onerror = () => { setIsTesting(false); setImageError('Unable to load image from the provided URL (CORS or invalid asset).'); resolve(false); };
+      img.src = testUrl;
+      // In some cases, the src assignment is enough to trigger load/error
+      setTimeout(() => { if (isTesting) { setIsTesting(false); resolve(false); } }, 4000);
+    });
+  };
+
+  const applyUrl = async () => {
+    if (!urlInput) return;
+    setImageError('');
+    // if it's a facebook URL, attempt to transform it
+    let resolved = urlInput.trim();
+    if (resolved.includes('facebook.com') && !resolved.includes('/picture')) resolved = transformFacebookUrl(resolved);
+
+    const ok = await testImageUrl(resolved);
+    if (ok) {
+      onChange(resolved);
+    } else {
+      // still allow using raw url but show error
+      onChange(resolved);
+    }
+  };
+
 
   return (
     <div className="space-y-4">
@@ -72,13 +130,19 @@ const ImageInput: React.FC<ImageInputProps> = ({
                  <i className="fa-solid fa-link absolute left-4 top-1/2 -translate-y-1/2 opacity-30 text-xs"></i>
                  <input 
                    type="text" 
-                   value={value} 
-                   onChange={e => onChange(e.target.value)}
+                   value={urlInput} 
+                   onChange={e => setUrlInput(e.target.value)}
+                   onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); applyUrl(); } }}
                    placeholder="Enter high-res image URL..."
-                   className="w-full pl-10 pr-4 py-4 rounded-xl bg-alaga-gray dark:bg-alaga-navy/20 border-2 border-transparent focus:border-alaga-blue/30 outline-none font-bold text-sm transition-all shadow-inner"
+                   className="w-full pl-10 pr-28 py-4 rounded-xl bg-alaga-gray dark:bg-alaga-navy/20 border-2 border-transparent focus:border-alaga-blue/30 outline-none font-bold text-sm transition-all shadow-inner"
                  />
+                 <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-2">
+                   <button type="button" onClick={applyUrl} className={`px-3 py-2 rounded-lg text-xs font-black uppercase bg-white dark:bg-alaga-charcoal`}>Apply</button>
+                   <button type="button" onClick={() => { applyUrl(); }} className={`px-3 py-2 rounded-lg text-xs font-black uppercase ${isTesting ? 'opacity-60 cursor-not-allowed' : 'bg-white dark:bg-alaga-charcoal'}`}>{isTesting ? 'Testing...' : 'Test'}</button>
+                 </div>
                </div>
-               <p className="text-[9px] font-medium opacity-40 italic">Tip: Use Unsplash or stable cloud links for municipal records.</p>
+               {imageError && <p className="text-[9px] font-medium text-red-500">{imageError}</p>}
+               <p className="text-[9px] font-medium opacity-40 italic">Tip: Use Unsplash, stable CDN, or paste a Facebook profile link — the system will try to resolve the profile picture.</p>
              </div>
            ) : (
              <div className="h-full">
