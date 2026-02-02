@@ -168,6 +168,7 @@ const Programs: React.FC = () => {
     };
     addUser(newUser);
     handleApply('ID', 'New PWD ID Issuance', undefined, newUser.id);
+    return true;
   };
 
   // Inventory Update Handlers

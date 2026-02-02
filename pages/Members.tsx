@@ -107,6 +107,7 @@ const Members: React.FC = () => {
 
     addUser(newUser);
     setActiveTab('Pending');
+    return true;
   };
 
   const handleUpdateProfile = (formData: any) => {

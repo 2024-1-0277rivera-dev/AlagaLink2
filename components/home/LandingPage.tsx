@@ -58,6 +58,7 @@ const LandingPage: React.FC = () => {
     addProgramRequest(newReq as any);
     // Auto-login the new (pending) user so they see their pending area
     loginById(newId);
+    return true;
   };
 
   // Open login/signup popovers when signaled via global searchSignal

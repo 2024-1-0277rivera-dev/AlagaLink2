@@ -77,6 +77,7 @@ const LandingPage: React.FC = () => {
     };
     addProgramRequest(newReq as any);
     loginById(newId);
+    return true;
   };
 
   React.useEffect(() => {

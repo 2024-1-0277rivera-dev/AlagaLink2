@@ -7,7 +7,7 @@ import { MUNICIPAL_ASSETS } from '../../mockData/assets';
 
 interface RegistrationWorkflowProps {
   customSections: any[];
-  onSubmit: (data: any, family: FamilyMember[]) => void;
+  onSubmit: (data: any, family: FamilyMember[]) => boolean | Promise<boolean | { success: boolean; message?: string } | void>;
   onCancel?: () => void;
   initialData?: Partial<UserProfile>;
   isEditMode?: boolean;
@@ -68,6 +68,9 @@ const RegistrationWorkflow: React.FC<RegistrationWorkflowProps> = ({
   const [emergencyContact, setEmergencyContact] = useState(
     initialData?.emergencyContact || { name: '', relation: '', contact: '' }
   );
+
+  const [submissionStatus, setSubmissionStatus] = useState<'idle'|'submitting'|'success'|'error'>('idle');
+  const [submissionMessage, setSubmissionMessage] = useState<string>('');
 
   const calculateAge = (birthDate: string): number => {
     if (!birthDate) return 0;
@@ -138,15 +141,49 @@ const RegistrationWorkflow: React.FC<RegistrationWorkflowProps> = ({
 
   const isStaff = formData.registrantType === 'PDAO Staff';
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmissionStatus('submitting');
+    setSubmissionMessage('');
+
     const finalData = {
       ...formData,
       emergencyContact,
       familyComposition: familyMembers,
       professionalQualifications: isStaff ? qualifications : undefined
     };
-    onSubmit(finalData, familyMembers);
+
+    try {
+      const result = await onSubmit(finalData, familyMembers);
+      let success = false;
+      let message = '';
+
+      if (result === undefined) {
+        success = true;
+      } else if (typeof result === 'boolean') {
+        success = result;
+      } else if (typeof result === 'object') {
+        success = Boolean(result.success ?? false);
+        message = (result as any).message || '';
+      }
+
+      if (success) {
+        setSubmissionStatus('success');
+        setSubmissionMessage(message || 'Registration successful.');
+        // Close after short delay so user can see feedback
+        setTimeout(() => {
+          setSubmissionStatus('idle');
+          setSubmissionMessage('');
+          if (onCancel) onCancel();
+        }, 1800);
+      } else {
+        setSubmissionStatus('error');
+        setSubmissionMessage(message || 'Registration failed. Please try again.');
+      }
+    } catch (err: any) {
+      setSubmissionStatus('error');
+      setSubmissionMessage(err?.message || 'Registration failed. Please try again.');
+    }
   };
 
   if (step === 'Choice') {
@@ -344,13 +381,19 @@ const RegistrationWorkflow: React.FC<RegistrationWorkflowProps> = ({
           </div>
         </div>
 
+        {submissionStatus !== 'idle' && (
+          <div className={`p-4 rounded-lg text-white font-bold mb-4 ${submissionStatus === 'success' ? 'bg-green-600' : submissionStatus === 'submitting' ? 'bg-yellow-500 text-black' : 'bg-red-600'}`}>
+            {submissionStatus === 'submitting' ? 'Submitting...' : submissionMessage}
+          </div>
+        )}
+
         <div className={`p-12 rounded-[24px] shadow-2xl flex flex-col md:flex-row items-center justify-between gap-10 relative overflow-hidden text-white ${isStaff ? 'bg-alaga-blue' : 'bg-alaga-teal'}`}>
           <div className="absolute top-0 right-0 p-8 opacity-10 rotate-12"><i className={`fa-solid ${isStaff ? 'fa-shield-halved' : 'fa-hands-holding-child'} text-9xl`}></i></div>
           <div className="relative z-10 max-w-xl">
             <h4 className="text-3xl font-black mb-3">{isEditMode ? 'Authorize Changes' : 'Submission Verification'}</h4>
             <p className="opacity-80 text-lg leading-relaxed font-medium">By finalizing this form, you certify that all information provided is true and correct.</p>
           </div>
-          <button type="submit" className="relative z-10 bg-alaga-gold text-alaga-navy px-12 py-6 rounded-[32px] font-black text-xl shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center gap-4">{isEditMode ? 'Save Verified Entry' : 'Finalize Registry Entry'}<i className={`fa-solid ${isEditMode ? 'fa-check-double' : 'fa-paper-plane'}`}></i></button>
+          <button type="submit" disabled={submissionStatus === 'submitting'} className={`relative z-10 bg-alaga-gold text-alaga-navy px-12 py-6 rounded-[32px] font-black text-xl shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center gap-4 ${submissionStatus === 'submitting' ? 'opacity-60 cursor-not-allowed' : ''}`}>{submissionStatus === 'submitting' ? 'Submitting...' : (isEditMode ? 'Save Verified Entry' : 'Finalize Registry Entry')}<i className={`fa-solid ${submissionStatus === 'submitting' ? 'fa-spinner fa-spin' : (isEditMode ? 'fa-check-double' : 'fa-paper-plane')}`}></i></button>
         </div>
       </form>
     </div>
