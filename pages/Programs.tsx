@@ -1,10 +1,9 @@
 
 'use client';
-/* eslint-disable react-hooks/purity -- Program handlers intentionally use runtime-generated ids and randomness in event handlers; rule is overly strict for these safe operations */
 import React, { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import { useAppContext } from '../context/AppContext';
-import { ProgramAvailment, LivelihoodProgram, AssistiveDevice, MedicalService, Narrative, UserProfile, DisabilityCategory } from '../types';
+import { ProgramAvailment, LivelihoodProgram, AssistiveDevice, MedicalService, UserProfile, DisabilityCategory } from '../types';
 import { MOCK_LIVELIHOODS, MOCK_DEVICES, MOCK_MEDICAL } from '../mockData/index';
 
 // Refactored Components
@@ -21,8 +20,6 @@ const Programs: React.FC = () => {
     currentUser, 
     users, 
     addUser, 
-    globalSearchQuery, 
-    customSections, 
     searchSignal, 
     setSearchSignal,
     programRequests,
@@ -38,13 +35,12 @@ const Programs: React.FC = () => {
   const [livelihoodPrograms, setLivelihoodPrograms] = useState<LivelihoodProgram[]>(MOCK_LIVELIHOODS);
   const [devices, setDevices] = useState<AssistiveDevice[]>(MOCK_DEVICES);
 
-
-
   // Portal Specific State
   const [idSearchQuery, setIdSearchQuery] = useState('');
-  const [showBrowseRegistry, setShowBrowseRegistry] = useState(false);
   const [isRegisteringNew, setIsRegisteringNew] = useState(false);
   const [backlogFilter, setBacklogFilter] = useState('All');
+
+  const idCounterRef = React.useRef(0);
 
   // User Application Workflow State
   const [applicationStep, setApplicationStep] = useState<'Selection' | 'Filling' | 'Success'>('Selection');
@@ -53,7 +49,6 @@ const Programs: React.FC = () => {
 
   // Modal Specific State
   const [selectedRequest, setSelectedRequest] = useState<ProgramAvailment | null>(null);
-  const [editingItem, setEditingItem] = useState<Partial<AssistiveDevice | MedicalService | LivelihoodProgram> | null>(null);
 
   const isAdmin = currentUser?.role === 'Admin' || currentUser?.role === 'SuperAdmin';
 
@@ -136,9 +131,9 @@ const Programs: React.FC = () => {
       return;
     }
 
-    /* eslint-disable-next-line react-hooks/purity -- id generation is intentional and runs only in an event handler */
+    const reqId = `req-${++idCounterRef.current}`;
     const newReq: ProgramAvailment = {
-      id: `req-${Date.now()}`,
+      id: reqId,
       userId: targetUserId,
       programType: type as ProgramAvailment['programType'],
       title: title,
@@ -165,11 +160,12 @@ const Programs: React.FC = () => {
 
   const handleRegisterNewMember = (formData: Partial<UserProfile>) => {
     const f = formData as Partial<UserProfile>;
-    const photoUrl = f.photoUrl || `https://randomuser.me/api/portraits/${(f.sex === 'Female' ? 'women' : 'men')}/${Math.floor(Math.random()*99)}.jpg`;
-    /* eslint-disable-next-line react-hooks/purity -- id generation is safe and is executed on user action */
+    const photoSeed = ++idCounterRef.current % 100;
+    const photoUrl = f.photoUrl || `https://randomuser.me/api/portraits/${(f.sex === 'Female' ? 'women' : 'men')}/${photoSeed}.jpg`;
+    const newUserId = `LT-${++idCounterRef.current}`;
     const newUser: UserProfile = {
       ...(formData as UserProfile),
-      id: `LT-${Date.now()}`,
+      id: newUserId,
       status: 'Pending',
       photoUrl,
       role: 'User',
@@ -183,7 +179,6 @@ const Programs: React.FC = () => {
   // Inventory Update Handlers
   const handleUpdateInventory = (itemType: string, itemData: Partial<AssistiveDevice | MedicalService | LivelihoodProgram>) => {
     const isNew = !itemData.id;
-    /* eslint-disable-next-line react-hooks/purity -- id generation for items is safe here */
     const finalData = { ...(itemData as Partial<AssistiveDevice | MedicalService | LivelihoodProgram>), id: isNew ? `item-${Date.now()}` : itemData.id } as Partial<AssistiveDevice | MedicalService | LivelihoodProgram>;
 
     if (itemType === 'Device') {

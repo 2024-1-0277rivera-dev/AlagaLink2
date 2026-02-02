@@ -2,7 +2,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import { useAppContext } from '../context/AppContext';
-import { UserProfile, FamilyMember, DisabilityCategory, Narrative } from '../types';
+import { UserProfile, DisabilityCategory } from '../types';
 
 // Refactored Components
 import MemberTable from '../components/members/MemberTable';
@@ -97,14 +97,12 @@ const Members: React.FC = () => {
   }, [users, globalSearchQuery, activeGroup, activeTab, isSuperAdmin]);
 
   const handleRegisterSubmit = (formData: Partial<UserProfile> & { sex?: string }) => {
-    /* eslint-disable-next-line react-hooks/purity -- photo URL randomization is safe inside an event handler */
     const f = formData as Partial<UserProfile> & { sex?: string };
     const photoUrl = f.photoUrl || `https://randomuser.me/api/portraits/${(f.sex === 'Female' ? 'women' : 'men')}/${Math.floor(Math.random()*99)}.jpg`;
     
     // Explicitly handle staff role creation
     const isStaffGroup = activeGroup === 'Staff';
     
-    /* eslint-disable-next-line react-hooks/purity -- id generation is safe inside an event handler */
     const newUser: UserProfile = {
       ...(formData as UserProfile),
       id: isStaffGroup ? `ADM-LT-${Date.now()}` : `LT-PWD-${Date.now()}`,
@@ -147,12 +145,6 @@ const Members: React.FC = () => {
 
   const submitPromotion = () => {
     if (!selectedUser) return;
-    const narrative: Narrative = {
-      what: 'Promotion to Super Admin',
-      when: promotionReasonData.effectiveDate,
-      why: `Performance: ${promotionReasonData.rating}. Competencies: ${promotionReasonData.competencies.join(', ')}. Justification: ${promotionReasonData.justification}`,
-      how: 'Executive Order / Super Admin Override'
-    };
     const updatedUser: UserProfile = {
       ...selectedUser,
       role: 'SuperAdmin'
