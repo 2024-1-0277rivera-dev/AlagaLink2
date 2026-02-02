@@ -89,8 +89,8 @@ const Members: React.FC = () => {
       const name = `${u.firstName} ${u.lastName}`.toLowerCase();
       const id = u.id.toLowerCase();
       const matchesSearch = name.includes(globalSearchQuery.toLowerCase()) || id.includes(globalSearchQuery.toLowerCase());
-      let matchesGroup = activeGroup === 'PWD' ? u.role === 'User' : (activeGroup === 'Staff' && isSuperAdmin ? (u.role === 'Admin' || u.role === 'SuperAdmin') : false);
-      let matchesTab = activeTab === 'Registered' ? u.status === 'Active' : (activeTab === 'Pending' ? u.status === 'Pending' : (activeTab === 'Suspended' ? u.status === 'Suspended' : true));
+      const matchesGroup = activeGroup === 'PWD' ? u.role === 'User' : (activeGroup === 'Staff' && isSuperAdmin ? (u.role === 'Admin' || u.role === 'SuperAdmin') : false);
+      const matchesTab = activeTab === 'Registered' ? u.status === 'Active' : (activeTab === 'Pending' ? u.status === 'Pending' : (activeTab === 'Suspended' ? u.status === 'Suspended' : true));
       return matchesSearch && matchesGroup && matchesTab;
     });
   }, [users, globalSearchQuery, activeGroup, activeTab, isSuperAdmin]);

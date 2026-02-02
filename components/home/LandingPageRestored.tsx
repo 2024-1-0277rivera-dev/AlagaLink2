@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import Image from 'next/image';
 import { useAppContext } from '../../context/AppContext';
 import { DisabilityCategory, AssistiveDevice, MedicalService, LivelihoodProgram, ProgramAvailment, UserProfile } from '../../types';
 import { MOCK_DEVICES, MOCK_MEDICAL, MOCK_LIVELIHOODS } from '../../mockData';
@@ -116,7 +117,7 @@ const LandingPage: React.FC = () => {
 
   const openAbout = (title: string, description: string) => setAboutService({ title, description });
 
-  const programsNotifCount = notifications.filter(n => n.link && n.link.startsWith('programs')).length;
+  
   const idNotif = notifications.some(n => n.programType === 'ID' || (n.link && n.link.startsWith('programs:ID')));
   const assistiveNotif = notifications.some(n => n.programType === 'Device' || (n.link && n.link.includes('requests') && n.programType === 'Device'));
   const medicalNotif = notifications.some(n => n.programType === 'Medical' || (n.link && n.link.includes('requests') && n.programType === 'Medical'));
@@ -228,7 +229,7 @@ const LandingPage: React.FC = () => {
               {/* Assistive Devices Card */}
               <div className="inflated-card bg-white dark:bg-alaga-charcoal rounded-[24px] overflow-hidden flex flex-col group transition-transform duration-300 ease-out transform-gpu hover:scale-105 hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-alaga-blue/10 h-full min-h-[260px] p-0">
                 <div className="relative h-44 overflow-hidden cursor-pointer bg-gradient-to-br from-alaga-blue/10 to-alaga-blue/5">
-                  <img src="/images/programs/standard wheelchair.jpg" alt="Wheelchairs and assistive devices" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 rounded-t-lg" />
+                <Image src="/images/programs/standard wheelchair.jpg" alt="Wheelchairs and assistive devices" fill className="object-cover transition-transform duration-700 group-hover:scale-105 rounded-t-lg" sizes="(min-width:1024px) 25vw, 100vw" />
                 </div>
                 <div className="p-6 space-y-3 flex flex-col flex-1">
                   <span className="text-alaga-blue text-[10px] font-black uppercase tracking-widest">Inventory Support</span>
@@ -326,7 +327,11 @@ const LandingPage: React.FC = () => {
             <div className="mt-6 space-y-4">
               {selectedService.id === 'devices' && MOCK_DEVICES.map((d: AssistiveDevice) => (
                 <div key={d.id} className="flex items-center gap-4 p-3 rounded-lg border border-gray-100">
-                  <img src={d.photoUrl || ''} alt={d.name} className="w-16 h-12 object-cover rounded" />
+                  {d.photoUrl ? (
+                    <Image src={d.photoUrl} alt={d.name} width={64} height={48} className="object-cover rounded" />
+                  ) : (
+                    <div className="w-16 h-12 rounded bg-gray-100" aria-hidden />
+                  )}
                   <div className="flex-1">
                     <div className="font-black">{d.name}</div>
                     <div className="text-xs opacity-60">{d.description || d.overview || ''}</div>
@@ -337,7 +342,11 @@ const LandingPage: React.FC = () => {
 
               {selectedService.id === 'medical' && MOCK_MEDICAL.map((m: MedicalService) => (
                 <div key={m.id} className="flex items-center gap-4 p-3 rounded-lg border border-gray-100">
-                  <img src={m.photoUrl || ''} alt={m.name} className="w-16 h-12 object-cover rounded" />
+                  {m.photoUrl ? (
+                    <Image src={m.photoUrl} alt={m.name} width={64} height={48} className="object-cover rounded" />
+                  ) : (
+                    <div className="w-16 h-12 rounded bg-gray-100" aria-hidden />
+                  )}
                   <div className="flex-1">
                     <div className="font-black">{m.name}</div>
                     <div className="text-xs opacity-60">{m.assistanceDetail || m.overview || ''}</div>
@@ -348,7 +357,41 @@ const LandingPage: React.FC = () => {
 
               {selectedService.id === 'livelihood' && MOCK_LIVELIHOODS.map((l: LivelihoodProgram) => (
                 <div key={l.id} className="flex items-center gap-4 p-3 rounded-lg border border-gray-100">
-                  <img src={l.photoUrl || ''} alt={l.photoAlt || l.title} className="w-16 h-12 object-cover rounded" />
+                  {l.photoUrl ? (
+                    <Image src={l.photoUrl} alt={l.photoAlt || l.title} width={64} height={48} className="object-cover rounded" />
+                  ) : (
+                    <div className="w-16 h-12 rounded bg-gray-100" aria-hidden />
+                  )}
+                  <div className="flex-1">
+                    <div className="font-black">{l.title}</div>
+                    <div className="text-xs opacity-60">{(l as unknown as { desc?: string; description?: string }).desc || (l as unknown as { desc?: string; description?: string }).description || l.overview || ''}</div>
+                  </div>
+                  <button onClick={() => { if (currentUser) { const req: ProgramAvailment = { id: `req-${Date.now()}`, userId: currentUser.id, programType: 'Livelihood', title: l.title || 'Livelihood Request', status: 'Pending', dateApplied: new Date().toISOString(), details: '', requestedItemId: l.id }; addProgramRequest(req); setShowServicePopover(false); } else { handleApplyAttempt({ id: l.id, title: l.title }); } }} className="px-3 py-2 bg-alaga-teal text-white rounded-md uppercase tracking-widest text-xs font-black transition-transform duration-200 hover:scale-105 shadow-sm">Request</button>
+                </div>
+              ))}
+
+              {selectedService.id === 'medical' && MOCK_MEDICAL.map((m: MedicalService) => (
+                <div key={m.id} className="flex items-center gap-4 p-3 rounded-lg border border-gray-100">
+                  {m.photoUrl ? (
+                    <Image src={m.photoUrl} alt={m.name} width={64} height={48} className="object-cover rounded" />
+                  ) : (
+                    <div className="w-16 h-12 rounded bg-gray-100" aria-hidden />
+                  )}
+                  <div className="flex-1">
+                    <div className="font-black">{m.name}</div>
+                    <div className="text-xs opacity-60">{m.assistanceDetail || m.overview || ''}</div>
+                  </div>
+                  <button onClick={() => { if (currentUser) { const req: ProgramAvailment = { id: `req-${Date.now()}`, userId: currentUser.id, programType: 'Medical', title: m.name || 'Medical Request', status: 'Pending', dateApplied: new Date().toISOString(), details: '', requestedItemId: m.id }; addProgramRequest(req); setShowServicePopover(false); } else { handleApplyAttempt({ id: m.id, title: m.name }); } }} className="px-3 py-2 bg-red-500 text-white rounded-md uppercase tracking-widest text-xs font-black transition-transform duration-200 hover:scale-105 shadow-sm">Request</button>
+                </div>
+              ))} 
+
+              {selectedService.id === 'livelihood' && MOCK_LIVELIHOODS.map((l: LivelihoodProgram) => (
+                <div key={l.id} className="flex items-center gap-4 p-3 rounded-lg border border-gray-100">
+                  {l.photoUrl ? (
+                    <Image src={l.photoUrl} alt={l.photoAlt || l.title} width={64} height={48} className="object-cover rounded" />
+                  ) : (
+                    <div className="w-16 h-12 rounded bg-gray-100" aria-hidden />
+                  )}
                   <div className="flex-1">
                     <div className="font-black">{l.title}</div>
                     <div className="text-xs opacity-60">{(l as unknown as { desc?: string; description?: string }).desc || (l as unknown as { desc?: string; description?: string }).description || l.overview || ''}</div>
