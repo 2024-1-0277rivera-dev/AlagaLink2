@@ -1,5 +1,6 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
+import Image from 'next/image';
 import { useAppContext } from '../context/AppContext';
 import { UserProfile, FamilyMember, DisabilityCategory, Narrative } from '../types';
 
@@ -257,7 +258,11 @@ const Members: React.FC = () => {
             ) : (
               <div className="flex flex-col md:flex-row">
                 <div className="md:w-1/3 bg-alaga-blue/5 p-8 flex flex-col items-center">
-                  <img src={selectedUser.photoUrl} className="w-40 h-40 rounded-[20px] shadow-2xl mb-6 object-cover border-4 border-white" />
+                  {selectedUser.photoUrl ? (
+                    <Image src={selectedUser.photoUrl} width={160} height={160} className="rounded-[20px] shadow-2xl mb-6 object-cover border-4 border-white" alt={`${selectedUser.firstName} ${selectedUser.lastName}`} />
+                  ) : (
+                    <div className="w-40 h-40 rounded-[20px] shadow-2xl mb-6 bg-gray-100 border-4 border-white" />
+                  )}
                   <h2 className="text-2xl font-black text-center leading-tight mb-1">{selectedUser.firstName} {selectedUser.lastName}</h2>
                   <p className="text-[10px] font-mono opacity-40 mb-6">{selectedUser.id}</p>
                   <div className="flex flex-col items-center gap-2 mb-8">
@@ -371,7 +376,11 @@ const Members: React.FC = () => {
             
             <div className="p-8 space-y-8">
               <div className="flex items-center gap-4 p-4 bg-purple-600/5 border border-purple-600/10 rounded-2xl">
-                <img src={selectedUser.photoUrl} className="w-12 h-12 rounded-xl object-cover" />
+                {selectedUser.photoUrl ? (
+                  <Image src={selectedUser.photoUrl} width={48} height={48} className="w-12 h-12 rounded-xl object-cover" alt={`${selectedUser.firstName} ${selectedUser.lastName}`} />
+                ) : (
+                  <div className="w-12 h-12 rounded-xl bg-gray-100" />
+                )}
                 <div>
                    <p className="text-xs font-black">{selectedUser.firstName} {selectedUser.lastName}</p>
                    <p className="text-[9px] opacity-40 uppercase font-bold tracking-widest">Candidate for Executive Role</p>

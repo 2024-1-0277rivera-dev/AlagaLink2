@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import Image from 'next/image';
 import { useAppContext } from '../context/AppContext';
 import NotificationPopover from './notifications/NotificationPopover';
 import { MOCK_UPDATES, MOCK_DEVICES, MOCK_MEDICAL, MOCK_LIVELIHOODS } from '../mockData/index';
@@ -269,7 +270,11 @@ const Navbar: React.FC<{ onNavigate: (page: string) => void, currentPage: string
               onClick={() => setShowProfileMenu(!showProfileMenu)}
             >
               {currentUser ? (
-                <img src={currentUser?.photoUrl} alt="Profile" className="w-8 h-8 md:w-9 md:h-9 rounded-[12px] md:rounded-[14px] border-2 border-white/30 object-cover shadow-md" />
+                currentUser?.photoUrl ? (
+                  <Image src={currentUser.photoUrl} width={36} height={36} alt="Profile" className="w-8 h-8 md:w-9 md:h-9 rounded-[12px] md:rounded-[14px] border-2 border-white/30 object-cover shadow-md" />
+                ) : (
+                  <div className="w-8 h-8 md:w-9 md:h-9 rounded-[12px] md:rounded-[14px] border-2 border-white/30 bg-gray-100" />
+                )
               ) : (
                 <div className="w-8 h-8 md:w-9 md:h-9 rounded-[12px] md:rounded-[14px] border-2 border-white/30 shadow-md bg-white/10 flex items-center justify-center">
                   <i className="fa-solid fa-circle-user text-lg md:text-xl opacity-80"></i>
@@ -401,7 +406,11 @@ const Navbar: React.FC<{ onNavigate: (page: string) => void, currentPage: string
                 {currentUser ? (
                   <>
                     <div className="flex items-center gap-4 p-4 bg-alaga-gray dark:bg-white/5 rounded-[24px]">
-                      <img src={currentUser?.photoUrl} className="w-12 h-12 rounded-xl object-cover" />
+                      {currentUser?.photoUrl ? (
+                        <Image src={currentUser.photoUrl} width={48} height={48} className="w-12 h-12 rounded-xl object-cover" alt={`${currentUser?.firstName} ${currentUser?.lastName}`} />
+                      ) : (
+                        <div className="w-12 h-12 rounded-xl bg-gray-100" />
+                      )}
                       <div className="flex-1 min-w-0">
                         <p className="font-black text-sm truncate">{currentUser?.firstName}</p>
                         <p className="text-[8px] opacity-40 uppercase font-black tracking-widest">{currentUser?.role}</p>

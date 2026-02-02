@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { fileToDataUrl } from '../../mockData/assets';
 
 interface ImageInputProps {
@@ -154,7 +155,7 @@ const ImageInput: React.FC<ImageInputProps> = ({
         <div className="md:col-span-1">
           <div className={`relative group overflow-hidden rounded-2xl border-4 border-white dark:border-white/5 shadow-xl bg-gray-100 dark:bg-alaga-navy/40 ${aspect === 'square' ? 'aspect-square' : 'aspect-video'}`}>
              {value ? (
-               <img src={value} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="Preview" />
+               <Image src={value} alt="Preview" width={600} height={400} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
              ) : (
                <div className="w-full h-full flex flex-col items-center justify-center opacity-20 p-4 text-center">
                  <i className="fa-solid fa-image text-3xl mb-2"></i>

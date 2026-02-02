@@ -4,6 +4,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useMemo } from 'react';
+import Image from 'next/image';
 import { 
   MOCK_USERS, 
   MOCK_REPORTS, 
@@ -246,7 +247,11 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onClose, targetUser, onBackToLi
         <div className="flex items-start gap-3">
           {/* Show staff avatar for admin views when available */}
           {msg.senderProfile && currentUser?.role !== 'User' && (
-            <img src={msg.senderProfile.photoUrl} title={msg.senderProfile.fullName} alt={msg.senderProfile.fullName} className="w-8 h-8 rounded-xl object-cover shadow-sm" />
+            msg.senderProfile.photoUrl ? (
+              <Image src={msg.senderProfile.photoUrl} width={32} height={32} title={msg.senderProfile.fullName} alt={msg.senderProfile.fullName} className="w-8 h-8 rounded-xl object-cover shadow-sm" />
+            ) : (
+              <div className="w-8 h-8 rounded-xl bg-gray-100 shadow-sm" />
+            )
           )}
 
           <div className={`max-w-[85%] px-5 py-3 rounded-[20px] text-sm font-medium leading-relaxed shadow-sm relative ${
@@ -296,7 +301,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onClose, targetUser, onBackToLi
         <div className={`p-6 text-white flex items-center justify-between shrink-0 ${isEmbedded ? 'bg-white dark:bg-alaga-charcoal !text-gray-900 dark:!text-white border-b border-gray-100 dark:border-white/5' : 'bg-alaga-blue'}`}>
           <div className="flex items-center space-x-3 overflow-hidden">
             {!isAiSelected && targetUser ? (
-              <img src={targetUser.photoUrl} className="w-12 h-12 rounded-2xl object-cover shadow-lg border-2 border-white" alt="" />
+              targetUser.photoUrl ? (
+                <Image src={targetUser.photoUrl} width={48} height={48} className="w-12 h-12 rounded-2xl object-cover shadow-lg border-2 border-white" alt={`${targetUser.firstName} ${targetUser.lastName}`} />
+              ) : (
+                <div className={`w-12 h-12 shrink-0 rounded-2xl flex items-center justify-center shadow-inner relative ${isEmbedded ? 'bg-alaga-blue text-white' : 'bg-white/20'}`}>
+                  <i className={`fa-solid ${isAiSelected || !targetUser ? 'fa-robot' : 'fa-hands-holding-child'} text-xl`}></i>
+                </div>
+              )
             ) : (
               <div className={`w-12 h-12 shrink-0 rounded-2xl flex items-center justify-center shadow-inner relative ${isEmbedded ? 'bg-alaga-blue text-white' : 'bg-white/20'}`}>
                 <i className={`fa-solid ${isAiSelected || !targetUser ? 'fa-robot' : 'fa-hands-holding-child'} text-xl`}></i>

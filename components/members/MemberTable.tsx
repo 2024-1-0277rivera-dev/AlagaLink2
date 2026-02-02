@@ -1,5 +1,6 @@
 
 import React from 'react';
+import Image from 'next/image';
 import { UserProfile } from '../../types';
 
 interface MemberTableProps {
@@ -28,7 +29,11 @@ const MemberTable: React.FC<MemberTableProps> = ({ users, onManage, canManage })
               return (
                 <tr key={user.id} className="hover:bg-alaga-gray dark:hover:bg-white/5 transition-colors group">
                   <td className="px-6 py-4 flex items-center space-x-3">
-                    <img src={user.photoUrl} className="w-10 h-10 rounded-full border border-gray-100 dark:border-white/10 object-cover" alt="" />
+                    {user.photoUrl ? (
+                      <Image src={user.photoUrl} width={40} height={40} className="w-10 h-10 rounded-full border border-gray-100 dark:border-white/10 object-cover" alt={`${user.firstName} ${user.lastName}`} />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full border border-gray-100 dark:border-white/10 bg-gray-100" />
+                    )}
                     <div>
                       <p className="font-bold">{user.firstName} {user.lastName}</p>
                       <p className="text-[10px] opacity-40 font-mono uppercase">{user.id}</p>
