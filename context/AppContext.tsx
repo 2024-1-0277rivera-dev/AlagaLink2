@@ -233,7 +233,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     // If an admin/superadmin is replying to a PWD, consolidate messages into the OFFICE thread
     let recipientForThread = toUserId;
-    let meta: any = undefined;
+    let meta: DirectMessage['meta'] | undefined = undefined;
 
     const recipientUser = users.find(u => u.id === toUserId);
 

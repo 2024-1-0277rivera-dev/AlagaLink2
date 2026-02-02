@@ -7,7 +7,7 @@
         "dev": "next dev",
         "build": "next build",
         "start": "next start",
-        "lint": "next lint"
+        "lint": "eslint . --ext .ts,.tsx,.js,.jsx --max-warnings=0"
     },
     "dependencies": {
         "groq-sdk": "^0.5.0",
@@ -22,6 +22,8 @@
         "autoprefixer": "^10.4.18",
         "postcss": "^8.4.33",
         "tailwindcss": "^3.4.1",
-        "typescript": "~5.8.2"
+        "typescript": "~5.8.2",
+        "eslint": "^9.39.2",
+        "eslint-config-next": "^16.1.5"
     }
 }

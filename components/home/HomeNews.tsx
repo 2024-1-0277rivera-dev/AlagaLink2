@@ -1,9 +1,21 @@
 
 import React, { useState, useMemo } from 'react';
 
+type UpdateItem = {
+  id: string;
+  title: string;
+  date: string;
+  timestamp?: number;
+  summary: string;
+  detail?: string;
+  photoUrl?: string;
+  type?: string;
+  category?: string;
+};
+
 interface HomeNewsProps {
-  updates: any[];
-  onSelect: (update: any) => void;
+  updates: UpdateItem[];
+  onSelect: (update: UpdateItem) => void;
   isAdmin?: boolean;
 }
 
@@ -60,7 +72,7 @@ const HomeNews: React.FC<HomeNewsProps> = ({ updates = [], onSelect, isAdmin = f
         {categories.map(cat => (
           <button
             key={cat.id}
-            onClick={() => setFilter(cat.id as any)}
+            onClick={() => setFilter(cat.id as 'All' | 'Alerts' | 'Programs' | 'Registry')}
             className={`px-4 py-1 text-[11px] font-black uppercase tracking-widest transition-all ${
               filter === cat.id 
                 ? 'bg-gray-900 text-white dark:bg-white dark:text-gray-900' 
@@ -149,7 +161,7 @@ const HomeNews: React.FC<HomeNewsProps> = ({ updates = [], onSelect, isAdmin = f
                         {item.title}
                       </h6>
                       <p className="text-[11px] opacity-60 line-clamp-3 leading-relaxed font-medium italic">
-                        "{item.summary}"
+                        &quot;{item.summary}&quot;
                       </p>
                     </div>
                   </div>

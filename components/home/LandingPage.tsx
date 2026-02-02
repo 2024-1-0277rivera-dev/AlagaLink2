@@ -1,7 +1,10 @@
 import React, { useState, useRef } from 'react';
 import { useAppContext } from '../../context/AppContext';
-import { DisabilityCategory } from '../../types';
+import { DisabilityCategory, UserProfile, AssistiveDevice, MedicalService, LivelihoodProgram, ProgramAvailment } from '../../types';
 import RegistrationWorkflow from '../members/RegistrationWorkflow';
+import { MOCK_DEVICES, MOCK_MEDICAL, MOCK_LIVELIHOODS } from '../../mockData/index';
+
+type ApplyTarget = { sentinelServiceId?: string; title?: string; id?: string; requestedItemId?: string; name?: string } | null;
 
 const LandingPage: React.FC = () => {
   const { currentUser, login, loginWithPassword, users, addUser, loginById, addProgramRequest, searchSignal, setSearchSignal, notifications } = useAppContext();
@@ -36,17 +39,19 @@ const LandingPage: React.FC = () => {
     }
   };
 
-  const handleRegister = (formData: any) => {
+  const handleRegister = (formData: Partial<UserProfile>) => {
+    /* eslint-disable-next-line react-hooks/purity -- id generation for new users is safe in an event handler */
     const newId = activeRegistration === 'Staff' ? `ADM-LT-${Date.now()}` : `LT-PWD-${Date.now()}`;
-    const newUser = {
-      ...formData,
+    const newUser: UserProfile = {
+      ...(formData as UserProfile),
       id: newId,
       status: 'Pending',
       history: { lostAndFound: [], programs: [] }
     };
     addUser(newUser);
     // Create an initial program request for ID issuance so the user appears in pending area
-    const newReq = {
+    const newReq: ProgramAvailment = {
+      /* eslint-disable-next-line react-hooks/purity -- id generation for new requests is safe in an event handler */
       id: `req-${Date.now()}`,
       userId: newId,
       programType: 'ID',
@@ -55,7 +60,7 @@ const LandingPage: React.FC = () => {
       dateApplied: new Date().toISOString(),
       details: ''
     };
-    addProgramRequest(newReq as any);
+    addProgramRequest(newReq);
     // Auto-login the new (pending) user so they see their pending area
     loginById(newId);
     return true;
@@ -80,12 +85,11 @@ const LandingPage: React.FC = () => {
     { title: 'Municipal Aid', icon: 'fa-hand-holding-medical', color: 'text-alaga-teal', ref: programsRef, desc: 'Direct access to medicine & devices.' },
     { title: 'Rapid Recovery', icon: 'fa-person-circle-question', color: 'text-red-500', ref: missingRef, desc: 'Community alert system for safety.' }
   ];
-  // Services catalog for landing page preview
-  const { MOCK_DEVICES, MOCK_MEDICAL, MOCK_LIVELIHOODS } = require('../../mockData/index');
+  // Services catalog for landing page preview (MOCK_* are imported at module scope)
   const [selectedService, setSelectedService] = React.useState<{ id: string; title: string; desc: string } | null>(null);
   const [showServicePopover, setShowServicePopover] = React.useState(false);
   const [showApplyPopover, setShowApplyPopover] = React.useState(false);
-  const [applyTarget, setApplyTarget] = React.useState<any>(null);
+  const [applyTarget, setApplyTarget] = React.useState<ApplyTarget>(null);
 
   // If the user was attempting to apply while logged out, complete the request after they log in
   React.useEffect(() => {
@@ -109,16 +113,16 @@ const LandingPage: React.FC = () => {
     }
 
     const title = applyTarget.title || selectedService?.title || (applyTarget && (applyTarget.title || applyTarget.name)) || 'Program Request';
-    const newReq = {
+    const newReq: ProgramAvailment = {
       id: `req-${Date.now()}`,
       userId: currentUser.id,
-      programType,
+      programType: programType as ProgramAvailment['programType'],
       title,
       status: 'Pending',
       dateApplied: new Date().toISOString(),
       details: '',
-      requestedItemId: applyTarget?.id || applyTarget?.requestedItemId || null
-    } as any;
+      requestedItemId: applyTarget?.id || applyTarget?.requestedItemId || undefined
+    };
 
     addProgramRequest(newReq);
     setShowApplyPopover(false);
@@ -131,7 +135,7 @@ const LandingPage: React.FC = () => {
     setShowServicePopover(true);
   };
 
-  const handleApplyAttempt = (item?: any) => {
+  const handleApplyAttempt = (item?: { id?: string; title?: string } | null) => {
     // If no specific item (example: PhilHealth enrollment), preserve the selectedService as a sentinel
     if (!item && selectedService?.id) {
       setApplyTarget({ sentinelServiceId: selectedService.id, title: selectedService.title });
@@ -452,43 +456,43 @@ const LandingPage: React.FC = () => {
             </div>
 
             <div className="mt-6 space-y-4">
-              {selectedService.id === 'devices' && MOCK_DEVICES.map((d: any) => (
+              {selectedService.id === 'devices' && MOCK_DEVICES.map((d: AssistiveDevice) => (
                 <div key={d.id} className="flex items-center gap-4 p-3 rounded-lg border border-gray-100">
-                  <img src={d.photo} alt={d.photoAlt || d.title} className="w-16 h-12 object-cover rounded" />
+                  <img src={d.photoUrl || ''} alt={d.name} className="w-16 h-12 object-cover rounded" />
                   <div className="flex-1">
-                    <div className="font-black">{d.title}</div>
-                    <div className="text-xs opacity-60">{d.desc || d.description || ''}</div>
+                    <div className="font-black">{d.name}</div>
+                    <div className="text-xs opacity-60">{d.description || d.overview || ''}</div>
                   </div>
-                  <button onClick={() => { if (currentUser) { const req = { id: `req-${Date.now()}`, userId: currentUser.id, programType: 'Device', title: d.title || 'Device Request', status: 'Pending', dateApplied: new Date().toISOString(), details: '', requestedItemId: d.id } as any; addProgramRequest(req); setShowServicePopover(false); } else { handleApplyAttempt(d); } }} className="px-3 py-2 bg-alaga-blue text-white rounded-md uppercase tracking-widest text-xs font-black transition-transform duration-200 hover:scale-105 shadow-sm">Request</button>
+                  <button onClick={() => { if (currentUser) { const req: ProgramAvailment = { id: `req-${Date.now()}`, userId: currentUser.id, programType: 'Device', title: d.name || 'Device Request', status: 'Pending', dateApplied: new Date().toISOString(), details: '', requestedItemId: d.id }; addProgramRequest(req); setShowServicePopover(false); } else { handleApplyAttempt({ id: d.id, title: d.name }); } }} className="px-3 py-2 bg-alaga-blue text-white rounded-md uppercase tracking-widest text-xs font-black transition-transform duration-200 hover:scale-105 shadow-sm">Request</button>
                 </div>
               ))}
 
-              {selectedService.id === 'medical' && MOCK_MEDICAL.map((m: any) => (
+              {selectedService.id === 'medical' && MOCK_MEDICAL.map((m: MedicalService) => (
                 <div key={m.id} className="flex items-center gap-4 p-3 rounded-lg border border-gray-100">
-                  <img src={m.photo} alt={m.photoAlt || m.title} className="w-16 h-12 object-cover rounded" />
+                  <img src={m.photoUrl || ''} alt={m.name} className="w-16 h-12 object-cover rounded" />
                   <div className="flex-1">
-                    <div className="font-black">{m.title}</div>
-                    <div className="text-xs opacity-60">{m.desc || m.description || ''}</div>
+                    <div className="font-black">{m.name}</div>
+                    <div className="text-xs opacity-60">{m.assistanceDetail || m.overview || ''}</div>
                   </div>
-                  <button onClick={() => { if (currentUser) { const req = { id: `req-${Date.now()}`, userId: currentUser.id, programType: 'Medical', title: m.title || 'Medical Request', status: 'Pending', dateApplied: new Date().toISOString(), details: '', requestedItemId: m.id } as any; addProgramRequest(req); setShowServicePopover(false); } else { handleApplyAttempt(m); } }} className="px-3 py-2 bg-red-500 text-white rounded-md uppercase tracking-widest text-xs font-black transition-transform duration-200 hover:scale-105 shadow-sm">Request</button>
+                  <button onClick={() => { if (currentUser) { const req: ProgramAvailment = { id: `req-${Date.now()}`, userId: currentUser.id, programType: 'Medical', title: m.name || 'Medical Request', status: 'Pending', dateApplied: new Date().toISOString(), details: '', requestedItemId: m.id }; addProgramRequest(req); setShowServicePopover(false); } else { handleApplyAttempt({ id: m.id, title: m.name }); } }} className="px-3 py-2 bg-red-500 text-white rounded-md uppercase tracking-widest text-xs font-black transition-transform duration-200 hover:scale-105 shadow-sm">Request</button>
                 </div>
               ))}
 
-              {selectedService.id === 'livelihood' && MOCK_LIVELIHOODS.map((l: any) => (
+              {selectedService.id === 'livelihood' && MOCK_LIVELIHOODS.map((l: LivelihoodProgram) => (
                 <div key={l.id} className="flex items-center gap-4 p-3 rounded-lg border border-gray-100">
-                  <img src={l.photo} alt={l.photoAlt || l.title} className="w-16 h-12 object-cover rounded" />
+                  <img src={l.photoUrl || ''} alt={l.photoAlt || l.title} className="w-16 h-12 object-cover rounded" />
                   <div className="flex-1">
                     <div className="font-black">{l.title}</div>
-                    <div className="text-xs opacity-60">{l.desc || l.description || ''}</div>
+                    <div className="text-xs opacity-60">{(l as unknown as { desc?: string; description?: string }).desc || (l as unknown as { desc?: string; description?: string }).description || l.overview || ''}</div>
                   </div>
-                  <button onClick={() => { if (currentUser) { const req = { id: `req-${Date.now()}`, userId: currentUser.id, programType: 'Livelihood', title: l.title || 'Livelihood Request', status: 'Pending', dateApplied: new Date().toISOString(), details: '', requestedItemId: l.id } as any; addProgramRequest(req); setShowServicePopover(false); } else { handleApplyAttempt(l); } }} className="px-3 py-2 bg-alaga-teal text-white rounded-md uppercase tracking-widest text-xs font-black transition-transform duration-200 hover:scale-105 shadow-sm">Request</button>
+                  <button onClick={() => { if (currentUser) { const req: ProgramAvailment = { id: `req-${Date.now()}`, userId: currentUser.id, programType: 'Livelihood', title: l.title || 'Livelihood Request', status: 'Pending', dateApplied: new Date().toISOString(), details: '', requestedItemId: l.id }; addProgramRequest(req); setShowServicePopover(false); } else { handleApplyAttempt({ id: l.id, title: l.title }); } }} className="px-3 py-2 bg-alaga-teal text-white rounded-md uppercase tracking-widest text-xs font-black transition-transform duration-200 hover:scale-105 shadow-sm">Request</button>
                 </div>
               ))}
 
               {selectedService.id === 'philhealth' && (
                 <div className="p-4 rounded-lg border border-gray-100">
                   <p className="opacity-70 text-sm">Sponsored PhilHealth enrollment and benefit assistance. To apply, please register or log in and follow the PhilHealth enrollment workflow.</p>
-              <div className="mt-6 flex items-center gap-3"><button onClick={() => { if (currentUser) { const req = { id: `req-${Date.now()}`, userId: currentUser.id, programType: 'PhilHealth', title: 'PhilHealth Enrollment', status: 'Pending', dateApplied: new Date().toISOString(), details: '' } as any; addProgramRequest(req); setShowServicePopover(false); } else { handleApplyAttempt(null); } }} className="px-4 py-2 bg-alaga-gold text-alaga-navy rounded-xl font-black text-xs">Request Enrollment</button><button onClick={() => setShowServicePopover(false)} className="px-4 py-2 border border-gray-200 rounded-xl text-xs">Close</button></div>
+              <div className="mt-6 flex items-center gap-3"><button onClick={() => { if (currentUser) { const req: ProgramAvailment = { id: `req-${Date.now()}`, userId: currentUser.id, programType: 'PhilHealth', title: 'PhilHealth Enrollment', status: 'Pending', dateApplied: new Date().toISOString(), details: '' }; addProgramRequest(req); setShowServicePopover(false); } else { handleApplyAttempt(null); } }} className="px-4 py-2 bg-alaga-gold text-alaga-navy rounded-xl font-black text-xs">Request Enrollment</button><button onClick={() => setShowServicePopover(false)} className="px-4 py-2 border border-gray-200 rounded-xl text-xs">Close</button></div>
                 </div>
               )}
 
@@ -507,7 +511,7 @@ const LandingPage: React.FC = () => {
                         <div className="font-black">New PWD ID Issuance</div>
                         <div className="text-xs opacity-60">Apply for your first official Municipal PWD ID.</div>
                       </div>
-                      <button onClick={() => { if (currentUser) { const req = { id: `req-${Date.now()}`, userId: currentUser.id, programType: 'ID', title: 'New PWD ID Issuance', status: 'Pending', dateApplied: new Date().toISOString(), details: '' } as any; addProgramRequest(req); setShowServicePopover(false); } else { handleApplyAttempt({ title: 'New PWD ID Issuance' }); } }} className="px-3 py-2 bg-alaga-blue text-white rounded text-xs font-black">Apply</button>
+                      <button onClick={() => { if (currentUser) { const req: ProgramAvailment = { id: `req-${Date.now()}`, userId: currentUser.id, programType: 'ID', title: 'New PWD ID Issuance', status: 'Pending', dateApplied: new Date().toISOString(), details: '' }; addProgramRequest(req); setShowServicePopover(false); } else { handleApplyAttempt({ title: 'New PWD ID Issuance' }); } }} className="px-3 py-2 bg-alaga-blue text-white rounded text-xs font-black">Apply</button>
                     </div>
                   </div>
                 </div>
@@ -611,7 +615,7 @@ const LandingPage: React.FC = () => {
                  </form>
 
                  <div className="text-center text-xs opacity-60 font-medium">
-                    Don't have an account? 
+                    Don&apos;t have an account? 
                     <button 
                       onClick={() => {
                         setShowLoginPopover(false);

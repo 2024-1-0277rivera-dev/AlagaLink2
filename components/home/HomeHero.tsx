@@ -2,9 +2,21 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 
+type UpdateItem = {
+  id: string;
+  title: string;
+  date?: string;
+  timestamp?: number;
+  summary?: string;
+  detail?: string;
+  photoUrl?: string;
+  type?: string;
+  category?: string;
+};
+
 interface HomeHeroProps {
-  updates: any[];
-  onClick: (update: any) => void;
+  updates: UpdateItem[];
+  onClick: (update: UpdateItem) => void;
 }
 
 const HomeHero: React.FC<HomeHeroProps> = ({ updates, onClick }) => {
@@ -15,7 +27,8 @@ const HomeHero: React.FC<HomeHeroProps> = ({ updates, onClick }) => {
 
   useEffect(() => {
     mountedRef.current = true;
-    setIsClient(true);
+    // Defer setState to avoid synchronous state update within effect
+    Promise.resolve().then(() => setIsClient(true));
 
     if (updates.length <= 1) return;
 

@@ -34,6 +34,15 @@ const ImageInput: React.FC<ImageInputProps> = ({
     }
   };
 
+  const handleDrop = async (e: React.DragEvent<HTMLElement>) => {
+    e.preventDefault();
+    const file = e.dataTransfer?.files?.[0];
+    if (file) {
+      const dataUrl = await fileToDataUrl(file);
+      onChange(dataUrl);
+    }
+  };
+
   // Transform facebook profile/page URLs into direct graph picture endpoints
   const transformFacebookUrl = (raw: string) => {
     try {
@@ -186,7 +195,7 @@ const ImageInput: React.FC<ImageInputProps> = ({
                  className={`h-full border-2 border-dashed rounded-2xl flex flex-col items-center justify-center p-6 transition-all cursor-pointer ${isDragging ? 'border-alaga-blue bg-alaga-blue/5 scale-[0.98]' : 'border-gray-200 dark:border-white/10 hover:bg-alaga-blue/5'}`}
                  onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
                  onDragLeave={() => setIsDragging(false)}
-                 onDrop={(e) => { e.preventDefault(); setIsDragging(false); handleFileUpload(e as any); }}
+                 onDrop={(e) => { e.preventDefault(); setIsDragging(false); handleDrop(e); }}
                >
                  <input type="file" accept="image/*" className="hidden" onChange={handleFileUpload} />
                  <div className={`w-12 h-12 rounded-full mb-3 flex items-center justify-center transition-all ${isDragging ? 'bg-alaga-blue text-white' : 'bg-alaga-blue/10 text-alaga-blue'}`}>

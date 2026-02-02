@@ -17,9 +17,9 @@ const FloatingAssistiveButton: React.FC = () => {
   // For non-admin users, track which thread they selected in their compact popover
   const [selectedThread, setSelectedThread] = useState<'AI' | 'Office' | null>(null);
 
-  // Initialize position on mount
+  // Initialize position on mount (defer setState to avoid calling setState synchronously within effect)
   useEffect(() => {
-    setPosition({ x: window.innerWidth - 90, y: window.innerHeight - 150 });
+    Promise.resolve().then(() => setPosition({ x: window.innerWidth - 90, y: window.innerHeight - 150 }));
   }, []);
   
   // Track if a drag actually happened to prevent accidental clicks
@@ -358,7 +358,7 @@ const FloatingAssistiveButton: React.FC = () => {
                 </button>
               </div>
 
-              <div className="mt-auto text-xs opacity-60">Office replies are consolidated and shown as "PDAO Office" to members.</div>
+              <div className="mt-auto text-xs opacity-60">Office replies are consolidated and shown as &quot;PDAO Office&quot; to members.</div>
             </aside>
 
             {/* RIGHT: Messaging area */}
@@ -374,7 +374,7 @@ const FloatingAssistiveButton: React.FC = () => {
               {selectedThread === 'Office' && (
                 <div className="h-full flex flex-col">
                   <div className="flex-1 overflow-hidden rounded-lg border border-gray-100 dark:border-white/5">
-                    <ChatWindow onClose={() => { setIsOpen(false); setSelectedThread(null); }} targetUser={{ id: OFFICE_ID, firstName: 'PDAO Office', lastName: '', role: 'User' } as any} isEmbedded={true} anchorPosition={position} />
+                    <ChatWindow onClose={() => { setIsOpen(false); setSelectedThread(null); }} targetUser={{ id: OFFICE_ID, firstName: 'PDAO Office', lastName: '', role: 'User' } as UserProfile} isEmbedded={true} anchorPosition={position} />
                   </div>
                 </div>
               )}

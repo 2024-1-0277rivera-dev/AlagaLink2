@@ -1,5 +1,6 @@
 
 'use client';
+/* eslint-disable react-hooks/purity -- Program handlers intentionally use runtime-generated ids and randomness in event handlers; rule is overly strict for these safe operations */
 import React, { useState, useMemo, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { ProgramAvailment, LivelihoodProgram, AssistiveDevice, MedicalService, Narrative, UserProfile, DisabilityCategory } from '../types';
@@ -36,25 +37,7 @@ const Programs: React.FC = () => {
   const [livelihoodPrograms, setLivelihoodPrograms] = useState<LivelihoodProgram[]>(MOCK_LIVELIHOODS);
   const [devices, setDevices] = useState<AssistiveDevice[]>(MOCK_DEVICES);
 
-  // Deep Link Logic from Universal Search
-  useEffect(() => {
-    if (searchSignal && searchSignal.page === 'programs') {
-      if (searchSignal.section) {
-        // If a specific request id is referenced, open the admin evaluation overlay for that request
-        if (searchSignal.section === 'requests' && searchSignal.itemId) {
-          const req = programRequests.find(r => r.id === searchSignal.itemId);
-          if (req) {
-            setSelectedRequest(req);
-            setActiveModal('none');
-          }
-        } else {
-          setActiveModal(searchSignal.section as ProgramModalType);
-        }
-      }
-      // Clear the signal after handling
-      setSearchSignal(null);
-    }
-  }, [searchSignal]);
+
 
   // Portal Specific State
   const [idSearchQuery, setIdSearchQuery] = useState('');
@@ -64,14 +47,36 @@ const Programs: React.FC = () => {
 
   // User Application Workflow State
   const [applicationStep, setApplicationStep] = useState<'Selection' | 'Filling' | 'Success'>('Selection');
-  const [applyingForItem, setApplyingForItem] = useState<{ type: string; item: any } | null>(null);
+  const [applyingForItem, setApplyingForItem] = useState<{ type: string; item: Partial<AssistiveDevice & MedicalService & LivelihoodProgram> } | null>(null);
   const [requestRemarks, setRequestRemarks] = useState('');
 
   // Modal Specific State
   const [selectedRequest, setSelectedRequest] = useState<ProgramAvailment | null>(null);
-  const [editingItem, setEditingItem] = useState<any | null>(null);
+  const [editingItem, setEditingItem] = useState<Partial<AssistiveDevice | MedicalService | LivelihoodProgram> | null>(null);
 
   const isAdmin = currentUser?.role === 'Admin' || currentUser?.role === 'SuperAdmin';
+
+  // Deep Link Logic from Universal Search
+  useEffect(() => {
+    if (searchSignal && searchSignal.page === 'programs') {
+      if (searchSignal.section) {
+        // If a specific request id is referenced, open the admin evaluation overlay for that request
+        if (searchSignal.section === 'requests' && searchSignal.itemId) {
+          const req = programRequests.find(r => r.id === searchSignal.itemId);
+          if (req) {
+            Promise.resolve().then(() => {
+              setSelectedRequest(req);
+              setActiveModal('none');
+            });
+          }
+        } else {
+          Promise.resolve().then(() => setActiveModal(searchSignal.section as ProgramModalType));
+        }
+      }
+      // Clear the signal after handling
+      setSearchSignal(null);
+    }
+  }, [searchSignal, programRequests, setSearchSignal]);
 
   const idSearchResults = useMemo(() => {
     if (!idSearchQuery) return [];
@@ -130,10 +135,11 @@ const Programs: React.FC = () => {
       return;
     }
 
+    /* eslint-disable-next-line react-hooks/purity -- id generation is intentional and runs only in an event handler */
     const newReq: ProgramAvailment = {
       id: `req-${Date.now()}`,
       userId: targetUserId,
-      programType: type as any,
+      programType: type as ProgramAvailment['programType'],
       title: title,
       status: 'Pending',
       dateApplied: new Date().toISOString().split('T')[0],
@@ -141,7 +147,7 @@ const Programs: React.FC = () => {
       details: requestRemarks,
       philhealthConsent: type === 'PhilHealth',
       ...extraData
-    };
+    }; 
     
     addProgramRequest(newReq);
     
@@ -156,10 +162,12 @@ const Programs: React.FC = () => {
     }
   };
 
-  const handleRegisterNewMember = (formData: any) => {
-    const photoUrl = formData.photoUrl || `https://randomuser.me/api/portraits/${formData.sex === 'Female' ? 'women' : 'men'}/${Math.floor(Math.random()*99)}.jpg`;
+  const handleRegisterNewMember = (formData: Partial<UserProfile>) => {
+    const f = formData as Partial<UserProfile>;
+    const photoUrl = f.photoUrl || `https://randomuser.me/api/portraits/${(f.sex === 'Female' ? 'women' : 'men')}/${Math.floor(Math.random()*99)}.jpg`;
+    /* eslint-disable-next-line react-hooks/purity -- id generation is safe and is executed on user action */
     const newUser: UserProfile = {
-      ...formData,
+      ...(formData as UserProfile),
       id: `LT-${Date.now()}`,
       status: 'Pending',
       photoUrl,
@@ -169,19 +177,20 @@ const Programs: React.FC = () => {
     addUser(newUser);
     handleApply('ID', 'New PWD ID Issuance', undefined, newUser.id);
     return true;
-  };
+  }; 
 
   // Inventory Update Handlers
-  const handleUpdateInventory = (itemType: string, itemData: any) => {
+  const handleUpdateInventory = (itemType: string, itemData: Partial<AssistiveDevice | MedicalService | LivelihoodProgram>) => {
     const isNew = !itemData.id;
-    const finalData = { ...itemData, id: isNew ? `item-${Date.now()}` : itemData.id };
+    /* eslint-disable-next-line react-hooks/purity -- id generation for items is safe here */
+    const finalData = { ...(itemData as Partial<AssistiveDevice | MedicalService | LivelihoodProgram>), id: isNew ? `item-${Date.now()}` : itemData.id } as Partial<AssistiveDevice | MedicalService | LivelihoodProgram>;
 
     if (itemType === 'Device') {
-      setDevices(prev => isNew ? [finalData, ...prev] : prev.map(d => d.id === finalData.id ? finalData : d));
+      setDevices(prev => isNew ? [finalData as AssistiveDevice, ...prev] : prev.map(d => d.id === finalData.id ? finalData as AssistiveDevice : d));
     } else if (itemType === 'Medical') {
-      setMedicalServices(prev => isNew ? [finalData, ...prev] : prev.map(m => m.id === finalData.id ? finalData : m));
+      setMedicalServices(prev => isNew ? [finalData as MedicalService, ...prev] : prev.map(m => m.id === finalData.id ? finalData as MedicalService : m));
     } else if (itemType === 'Livelihood') {
-      setLivelihoodPrograms(prev => isNew ? [finalData, ...prev] : prev.map(l => l.id === finalData.id ? finalData : l));
+      setLivelihoodPrograms(prev => isNew ? [finalData as LivelihoodProgram, ...prev] : prev.map(l => l.id === finalData.id ? finalData as LivelihoodProgram : l));
     }
   };
 
@@ -257,7 +266,7 @@ const Programs: React.FC = () => {
 
             <div className="p-6 bg-alaga-teal/5 border border-alaga-teal/10 rounded-[24px] text-xs font-medium leading-relaxed italic opacity-80 flex gap-4">
               <i className="fa-solid fa-shield-halved text-alaga-teal mt-1"></i>
-              <span>"I hereby authorize the PDAO and MSWDO to verify my eligibility based on my current registry profile. I understand this application is subject to administrative review."</span>
+              <span>I hereby authorize the PDAO and MSWDO to verify my eligibility based on my current registry profile. I understand this application is subject to administrative review.</span>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 pt-4">

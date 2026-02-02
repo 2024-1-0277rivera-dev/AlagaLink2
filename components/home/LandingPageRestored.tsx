@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useAppContext } from '../../context/AppContext';
-import { DisabilityCategory } from '../../types';
+import { DisabilityCategory, AssistiveDevice, MedicalService, LivelihoodProgram, ProgramAvailment, UserProfile } from '../../types';
+import { MOCK_DEVICES, MOCK_MEDICAL, MOCK_LIVELIHOODS } from '../../mockData';
 import RegistrationWorkflow from '../members/RegistrationWorkflow';
 import CommunityVigilCarousel from '../lost-found/CommunityVigilCarousel';
 
@@ -19,19 +20,19 @@ const LandingPage: React.FC = () => {
   const joinRef = useRef<HTMLDivElement>(null);
   const [aboutService, setAboutService] = useState<{ title: string; description: string } | null>(null);
 
-  // Services catalog for landing page preview
-  const { MOCK_DEVICES, MOCK_MEDICAL, MOCK_LIVELIHOODS } = require('../../mockData/index');
+  // Services catalog for landing page preview (MOCK_* are imported at module scope)
+  type ApplyTarget = { sentinelServiceId?: string; title?: string; id?: string; requestedItemId?: string; name?: string } | null;
   const [selectedService, setSelectedService] = useState<{ id: string; title: string; desc: string } | null>(null);
   const [showServicePopover, setShowServicePopover] = useState(false);
   const [showApplyPopover, setShowApplyPopover] = useState(false);
-  const [applyTarget, setApplyTarget] = useState<any>(null);
+  const [applyTarget, setApplyTarget] = useState<ApplyTarget>(null);
 
   const openService = (id: string, title: string, desc: string) => {
     setSelectedService({ id, title, desc });
     setShowServicePopover(true);
   };
 
-  const handleApplyAttempt = (item?: any) => {
+  const handleApplyAttempt = (item?: { id?: string; title?: string } | null) => {
     if (!item && selectedService?.id) {
       setApplyTarget({ sentinelServiceId: selectedService.id, title: selectedService.title });
     } else {
@@ -57,16 +58,34 @@ const LandingPage: React.FC = () => {
     }
   };
 
-  const handleRegister = (formData: any) => {
+  const handleRegister = (formData: Partial<UserProfile>) => {
     const newId = activeRegistration === 'Staff' ? `ADM-LT-${Date.now()}` : `LT-PWD-${Date.now()}`;
-    const newUser = {
-      ...formData,
+    const newUser: UserProfile = {
       id: newId,
+      email: (formData.email as string) || `${newId}@local`,
+      role: activeRegistration === 'Staff' ? 'Admin' : 'User',
+      firstName: (formData.firstName as string) || 'First',
+      lastName: (formData.lastName as string) || 'Last',
+      address: (formData.address as string) || '',
+      birthDate: (formData.birthDate as string) || new Date().toISOString(),
+      provincialAddress: (formData.provincialAddress as string) || '',
+      civilStatus: (formData.civilStatus as string) || 'Single',
+      occupation: (formData.occupation as string) || '',
+      sex: (formData.sex as 'Male' | 'Female' | 'Other') || 'Other',
+      bloodType: (formData.bloodType as string) || 'N/A',
+      age: (formData.age as number) || 0,
+      contactNumber: (formData.contactNumber as string) || '',
+      disabilityCategory: (formData.disabilityCategory as DisabilityCategory) || DisabilityCategory.None,
+      familyComposition: (formData.familyComposition as unknown as import('../../types').FamilyMember[]) || [],
+      emergencyContact: (formData.emergencyContact as unknown as { name: string; relation: string; contact: string; }) || { name: '', relation: '', contact: '' },
+      registrantType: activeRegistration === 'Staff' ? 'PDAO Staff' : 'Self',
       status: 'Pending',
+      photoUrl: (formData.photoUrl as string) || '',
+      customData: (formData.customData as Record<string, string>) || {},
       history: { lostAndFound: [], programs: [] }
     };
     addUser(newUser);
-    const newReq = {
+    const newReq: ProgramAvailment = {
       id: `req-${Date.now()}`,
       userId: newId,
       programType: 'ID',
@@ -75,7 +94,7 @@ const LandingPage: React.FC = () => {
       dateApplied: new Date().toISOString(),
       details: ''
     };
-    addProgramRequest(newReq as any);
+    addProgramRequest(newReq);
     loginById(newId);
     return true;
   };
@@ -305,36 +324,36 @@ const LandingPage: React.FC = () => {
             </div>
 
             <div className="mt-6 space-y-4">
-              {selectedService.id === 'devices' && MOCK_DEVICES.map((d: any) => (
+              {selectedService.id === 'devices' && MOCK_DEVICES.map((d: AssistiveDevice) => (
                 <div key={d.id} className="flex items-center gap-4 p-3 rounded-lg border border-gray-100">
-                  <img src={d.photo} alt={d.photoAlt || d.title} className="w-16 h-12 object-cover rounded" />
+                  <img src={d.photoUrl || ''} alt={d.name} className="w-16 h-12 object-cover rounded" />
                   <div className="flex-1">
-                    <div className="font-black">{d.title}</div>
-                    <div className="text-xs opacity-60">{d.desc || d.description || ''}</div>
+                    <div className="font-black">{d.name}</div>
+                    <div className="text-xs opacity-60">{d.description || d.overview || ''}</div>
                   </div>
-                  <button onClick={() => { if (currentUser) { const req = { id: `req-${Date.now()}`, userId: currentUser.id, programType: 'Device', title: d.title || 'Device Request', status: 'Pending', dateApplied: new Date().toISOString(), details: '', requestedItemId: d.id } as any; addProgramRequest(req); setShowServicePopover(false); } else { handleApplyAttempt(d); } }} className="px-3 py-2 bg-alaga-blue text-white rounded-md uppercase tracking-widest text-xs font-black transition-transform duration-200 hover:scale-105 shadow-sm">Request</button>
+                  <button onClick={() => { if (currentUser) { const req: ProgramAvailment = { id: `req-${Date.now()}`, userId: currentUser.id, programType: 'Device', title: d.name || 'Device Request', status: 'Pending', dateApplied: new Date().toISOString(), details: '', requestedItemId: d.id }; addProgramRequest(req); setShowServicePopover(false); } else { handleApplyAttempt({ id: d.id, title: d.name }); } }} className="px-3 py-2 bg-alaga-blue text-white rounded-md uppercase tracking-widest text-xs font-black transition-transform duration-200 hover:scale-105 shadow-sm">Request</button>
                 </div>
               ))}
 
-              {selectedService.id === 'medical' && MOCK_MEDICAL.map((m: any) => (
+              {selectedService.id === 'medical' && MOCK_MEDICAL.map((m: MedicalService) => (
                 <div key={m.id} className="flex items-center gap-4 p-3 rounded-lg border border-gray-100">
-                  <img src={m.photo} alt={m.photoAlt || m.title} className="w-16 h-12 object-cover rounded" />
+                  <img src={m.photoUrl || ''} alt={m.name} className="w-16 h-12 object-cover rounded" />
                   <div className="flex-1">
-                    <div className="font-black">{m.title}</div>
-                    <div className="text-xs opacity-60">{m.desc || m.description || ''}</div>
+                    <div className="font-black">{m.name}</div>
+                    <div className="text-xs opacity-60">{m.assistanceDetail || m.overview || ''}</div>
                   </div>
-                  <button onClick={() => { if (currentUser) { const req = { id: `req-${Date.now()}`, userId: currentUser.id, programType: 'Medical', title: m.title || 'Medical Request', status: 'Pending', dateApplied: new Date().toISOString(), details: '', requestedItemId: m.id } as any; addProgramRequest(req); setShowServicePopover(false); } else { handleApplyAttempt(m); } }} className="px-3 py-2 bg-red-500 text-white rounded-md uppercase tracking-widest text-xs font-black transition-transform duration-200 hover:scale-105 shadow-sm">Request</button>
+                  <button onClick={() => { if (currentUser) { const req: ProgramAvailment = { id: `req-${Date.now()}`, userId: currentUser.id, programType: 'Medical', title: m.name || 'Medical Request', status: 'Pending', dateApplied: new Date().toISOString(), details: '', requestedItemId: m.id }; addProgramRequest(req); setShowServicePopover(false); } else { handleApplyAttempt({ id: m.id, title: m.name }); } }} className="px-3 py-2 bg-red-500 text-white rounded-md uppercase tracking-widest text-xs font-black transition-transform duration-200 hover:scale-105 shadow-sm">Request</button>
                 </div>
               ))}
 
-              {selectedService.id === 'livelihood' && MOCK_LIVELIHOODS.map((l: any) => (
+              {selectedService.id === 'livelihood' && MOCK_LIVELIHOODS.map((l: LivelihoodProgram) => (
                 <div key={l.id} className="flex items-center gap-4 p-3 rounded-lg border border-gray-100">
-                  <img src={l.photo} alt={l.photoAlt || l.title} className="w-16 h-12 object-cover rounded" />
+                  <img src={l.photoUrl || ''} alt={l.photoAlt || l.title} className="w-16 h-12 object-cover rounded" />
                   <div className="flex-1">
                     <div className="font-black">{l.title}</div>
-                    <div className="text-xs opacity-60">{l.desc || l.description || ''}</div>
+                    <div className="text-xs opacity-60">{(l as unknown as { desc?: string; description?: string }).desc || (l as unknown as { desc?: string; description?: string }).description || l.overview || ''}</div>
                   </div>
-                  <button onClick={() => { if (currentUser) { const req = { id: `req-${Date.now()}`, userId: currentUser.id, programType: 'Livelihood', title: l.title || 'Livelihood Request', status: 'Pending', dateApplied: new Date().toISOString(), details: '', requestedItemId: l.id } as any; addProgramRequest(req); setShowServicePopover(false); } else { handleApplyAttempt(l); } }} className="px-3 py-2 bg-alaga-teal text-white rounded-md uppercase tracking-widest text-xs font-black transition-transform duration-200 hover:scale-105 shadow-sm">Request</button>
+                  <button onClick={() => { if (currentUser) { const req: ProgramAvailment = { id: `req-${Date.now()}`, userId: currentUser.id, programType: 'Livelihood', title: l.title || 'Livelihood Request', status: 'Pending', dateApplied: new Date().toISOString(), details: '', requestedItemId: l.id }; addProgramRequest(req); setShowServicePopover(false); } else { handleApplyAttempt({ id: l.id, title: l.title }); } }} className="px-3 py-2 bg-alaga-teal text-white rounded-md uppercase tracking-widest text-xs font-black transition-transform duration-200 hover:scale-105 shadow-sm">Request</button>
                 </div>
               ))}
 
@@ -359,7 +378,7 @@ const LandingPage: React.FC = () => {
                         <div className="font-black">New PWD ID Issuance</div>
                         <div className="text-xs opacity-60">Apply for your first official Municipal PWD ID.</div>
                       </div>
-                      <button onClick={() => { if (currentUser) { const req = { id: `req-${Date.now()}`, userId: currentUser.id, programType: 'ID', title: 'New PWD ID Issuance', status: 'Pending', dateApplied: new Date().toISOString(), details: '' } as any; addProgramRequest(req); setShowServicePopover(false); } else { handleApplyAttempt({ title: 'New PWD ID Issuance' }); } }} className="px-3 py-2 bg-alaga-blue text-white rounded text-xs font-black">Apply</button>
+                      <button onClick={() => { if (currentUser) { const req: ProgramAvailment = { id: `req-${Date.now()}`, userId: currentUser.id, programType: 'ID', title: 'New PWD ID Issuance', status: 'Pending', dateApplied: new Date().toISOString(), details: '' }; addProgramRequest(req); setShowServicePopover(false); } else { handleApplyAttempt({ title: 'New PWD ID Issuance' }); } }} className="px-3 py-2 bg-alaga-blue text-white rounded text-xs font-black">Apply</button>
                     </div>
                   </div>
                 </div>
@@ -390,7 +409,7 @@ const LandingPage: React.FC = () => {
       <footer className="py-20 px-6 text-center opacity-30"><p className="text-[10px] font-black uppercase tracking-[0.5em]">La Trinidad Municipal Government • Benguet Province</p></footer>
 
       {showLoginPopover && (
-        <div className="fixed inset-0 z-[400] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300"><div className="bg-white dark:bg-alaga-charcoal rounded-[48px] w-full max-w-md shadow-[0_40px_100px_rgba(0,0,0,0.5)] overflow-hidden animate-in zoom-in-95 duration-300 relative border border-white/10"><button onClick={() => { setShowLoginPopover(false); setEmail(''); setPassword(''); setLoginError(''); }} className="absolute top-8 right-8 w-12 h-12 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all z-20"><i className="fa-solid fa-xmark"></i></button><div className="p-12 md:p-16 space-y-8"><div className="text-center space-y-2"><h3 className="text-3xl font-black">System Login</h3><p className="opacity-60 font-medium text-sm">Access your AlagaLink account</p></div><form onSubmit={handleLogin} className="space-y-6"><div><label className="text-xs font-black uppercase tracking-widest opacity-60 block mb-3">Email or Username</label><input type="text" value={email} onChange={(e) => {setEmail(e.target.value); setLoginError('');}} placeholder="Enter your email or user ID" className="w-full px-6 py-4 rounded-[20px] bg-alaga-gray dark:bg-white/5 border border-alaga-gold/20 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-alaga-blue placeholder:opacity-30 font-medium" /></div><div><label className="text-xs font-black uppercase tracking-widest opacity-60 block mb-3">Password</label><input type="password" value={password} onChange={(e) => {setPassword(e.target.value); setLoginError('');}} placeholder="Enter your password" className="w-full px-6 py-4 rounded-[20px] bg-alaga-gray dark:bg-white/5 border border-alaga-gold/20 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-alaga-blue placeholder:opacity-30 font-medium" /></div>{loginError && <div className="p-4 rounded-[16px] bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 text-sm font-black"><i className="fa-solid fa-exclamation-circle mr-2"></i> {loginError}</div>}<button type="submit" className="w-full py-4 rounded-[20px] bg-alaga-blue text-white font-black uppercase tracking-widest text-sm hover:shadow-lg hover:shadow-alaga-blue/50 transition-all active:scale-95"><i className="fa-solid fa-arrow-right-to-bracket mr-2"></i> Log In Now</button></form><div className="text-center text-xs opacity-60 font-medium">Don't have an account? <button onClick={() => { setShowLoginPopover(false); setShowSignupPopover(true); setEmail(''); setPassword(''); setLoginError(''); }} className="text-alaga-teal font-black ml-1 hover:underline">Sign up here</button></div></div></div></div>
+        <div className="fixed inset-0 z-[400] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300"><div className="bg-white dark:bg-alaga-charcoal rounded-[48px] w-full max-w-md shadow-[0_40px_100px_rgba(0,0,0,0.5)] overflow-hidden animate-in zoom-in-95 duration-300 relative border border-white/10"><button onClick={() => { setShowLoginPopover(false); setEmail(''); setPassword(''); setLoginError(''); }} className="absolute top-8 right-8 w-12 h-12 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all z-20"><i className="fa-solid fa-xmark"></i></button><div className="p-12 md:p-16 space-y-8"><div className="text-center space-y-2"><h3 className="text-3xl font-black">System Login</h3><p className="opacity-60 font-medium text-sm">Access your AlagaLink account</p></div><form onSubmit={handleLogin} className="space-y-6"><div><label className="text-xs font-black uppercase tracking-widest opacity-60 block mb-3">Email or Username</label><input type="text" value={email} onChange={(e) => {setEmail(e.target.value); setLoginError('');}} placeholder="Enter your email or user ID" className="w-full px-6 py-4 rounded-[20px] bg-alaga-gray dark:bg-white/5 border border-alaga-gold/20 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-alaga-blue placeholder:opacity-30 font-medium" /></div><div><label className="text-xs font-black uppercase tracking-widest opacity-60 block mb-3">Password</label><input type="password" value={password} onChange={(e) => {setPassword(e.target.value); setLoginError('');}} placeholder="Enter your password" className="w-full px-6 py-4 rounded-[20px] bg-alaga-gray dark:bg-white/5 border border-alaga-gold/20 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-alaga-blue placeholder:opacity-30 font-medium" /></div>{loginError && <div className="p-4 rounded-[16px] bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 text-sm font-black"><i className="fa-solid fa-exclamation-circle mr-2"></i> {loginError}</div>}<button type="submit" className="w-full py-4 rounded-[20px] bg-alaga-blue text-white font-black uppercase tracking-widest text-sm hover:shadow-lg hover:shadow-alaga-blue/50 transition-all active:scale-95"><i className="fa-solid fa-arrow-right-to-bracket mr-2"></i> Log In Now</button></form><div className="text-center text-xs opacity-60 font-medium">Don&apos;t have an account? <button onClick={() => { setShowLoginPopover(false); setShowSignupPopover(true); setEmail(''); setPassword(''); setLoginError(''); }} className="text-alaga-teal font-black ml-1 hover:underline">Sign up here</button></div></div></div></div>
       )}
 
       {showPWDIDPopover && (

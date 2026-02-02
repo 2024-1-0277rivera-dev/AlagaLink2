@@ -93,7 +93,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onClose, targetUser, onBackToLi
       let isOfficeThread = false;
 
       const targetIsOffice = targetUser.id === OFFICE_ID;
-      const targetIsUser = (targetUser as any).role === 'User';
+      const targetIsUser = targetUser?.role === 'User';
 
       if (targetIsOffice) {
         threadKey = [currentUser.id, OFFICE_ID].sort().join('_');

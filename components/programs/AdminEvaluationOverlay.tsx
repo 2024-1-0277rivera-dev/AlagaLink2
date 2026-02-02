@@ -6,8 +6,8 @@ interface AdminEvaluationOverlayProps {
   user?: UserProfile;
   fields?: React.ReactNode;
   onClose: () => void;
-  onApprove: (id: string, status: any, narrative: Narrative) => void;
-  onReject: (id: string, status: any) => void;
+  onApprove: (id: string, status: ProgramAvailment['status'], narrative: Narrative) => void;
+  onReject: (id: string, status: ProgramAvailment['status']) => void;
 }
 
 const AdminEvaluationOverlay: React.FC<AdminEvaluationOverlayProps> = ({ req, user, fields, onClose, onApprove, onReject }) => {
@@ -64,7 +64,7 @@ const AdminEvaluationOverlay: React.FC<AdminEvaluationOverlayProps> = ({ req, us
               <p className="text-[10px] font-black opacity-40 uppercase mb-3 tracking-widest flex items-center gap-2">
                 <i className="fa-solid fa-file-circle-info text-alaga-blue"></i> Applicant Remarks
               </p>
-              <p className="text-sm italic leading-relaxed opacity-70">"{req.details || 'No additional details provided by the applicant.'}"</p>
+              <p className="text-sm italic leading-relaxed opacity-70">{req.details || 'No additional details provided by the applicant.'}</p>
               {req.philhealthConsent && (
                 <div className="mt-4 pt-4 border-t border-gray-100 dark:border-white/5">
                   <span className="bg-alaga-teal/10 text-alaga-teal px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter">

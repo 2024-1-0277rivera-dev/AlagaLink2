@@ -95,7 +95,7 @@ const CaseDetailModal: React.FC<CaseDetailModalProps> = ({ report, onClose }) =>
                  </div>
                  <div className="pt-4 border-t border-gray-200 dark:border-white/5">
                     <p className="text-[10px] font-black uppercase opacity-40 mb-1">Behavioral Context / Narrative</p>
-                    <p className="text-xs opacity-70 leading-relaxed italic">"{report.description}"</p>
+                    <p className="text-xs opacity-70 leading-relaxed italic">&quot;{report.description}&quot;</p>
                  </div>
               </div>
             </section>

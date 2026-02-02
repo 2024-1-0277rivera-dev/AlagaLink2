@@ -19,10 +19,10 @@ const LostFoundHeader: React.FC<LostFoundHeaderProps> = ({ filter, onSetFilter, 
         <p className="opacity-60">Help our community reconnect. Every share counts.</p>
         
         <div className="flex space-x-2 mt-4 bg-white dark:bg-alaga-charcoal p-1 rounded-full w-fit border border-gray-100 dark:border-white/5">
-          {['All', 'Missing', 'Found'].map(f => (
+          {(['All', 'Missing', 'Found'] as const).map((f: 'All' | 'Missing' | 'Found') => (
             <button 
               key={f}
-              onClick={() => onSetFilter(f as any)}
+              onClick={() => onSetFilter(f)}
               className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${filter === f ? 'bg-alaga-blue text-white shadow-md' : 'hover:bg-alaga-gray dark:hover:bg-white/5'}`}
             >
               {f}

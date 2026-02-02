@@ -139,7 +139,7 @@ const PhilHealthPortal: React.FC<PhilHealthPortalProps> = ({ isAdmin, requests, 
                 className="mt-1 w-5 h-5 accent-alaga-teal" 
               />
               <span className="text-sm font-medium group-hover:text-alaga-teal transition-colors">
-                "By signing here, I consent to PhilHealth processing my membership with PWD/CWD benefits."
+                &quot;By signing here, I consent to PhilHealth processing my membership with PWD/CWD benefits.&quot;
               </span>
             </label>
           </div>

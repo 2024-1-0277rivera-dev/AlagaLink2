@@ -1,5 +1,20 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
+
+type DynamicUpdate = {
+  id: string;
+  title: string;
+  date: string;
+  timestamp: number;
+  summary: string;
+  detail?: string;
+  link?: string;
+  itemId?: string;
+  photoUrl?: string;
+  type?: string;
+  category?: string;
+  section?: string;
+};
 import { useAppContext } from '../context/AppContext';
 import { 
   MOCK_UPDATES, 
@@ -17,7 +32,7 @@ import LandingPage from '../components/home/LandingPageRestored';
 
 const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) => {
   const { users, reports, globalSearchQuery, searchSignal, setSearchSignal, currentUser, programRequests } = useAppContext();
-  const [selectedUpdate, setSelectedUpdate] = useState<any | null>(null);
+  const [selectedUpdate, setSelectedUpdate] = useState<DynamicUpdate | null>(null);
   const [showPendingOptions, setShowPendingOptions] = useState(false);
   const [showRegisteredOptions, setShowRegisteredOptions] = useState(false);
 
@@ -29,8 +44,10 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
   const hasDigitalId = currentUser?.status === 'Active' && !!approvedIDRequest && !!currentUser?.idMetadata;
 
   // Generate dynamic updates from system state (Aggregated Feed - NO LIMITS)
-  const dynamicUpdates = useMemo(() => {
-    const items: any[] = [];
+  const [dynamicUpdates, setDynamicUpdates] = useState<DynamicUpdate[]>([]);
+
+  useEffect(() => {
+    const items: DynamicUpdate[] = [];
 
     // 1. Add ALL Reports
     reports.forEach(r => {
@@ -136,8 +153,10 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
       timestamp: Date.now() - (upd.id * 100000000)
     }));
 
-    // FINAL SORT: Most recent first across all categories
-    return items.sort((a, b) => b.timestamp - a.timestamp);
+      // FINAL SORT: Most recent first across all categories
+    const sorted = items.sort((a, b) => b.timestamp - a.timestamp);
+    // Defer state update to avoid synchronous setState in effect
+    Promise.resolve().then(() => setDynamicUpdates(sorted));
   }, [reports, users, isAdmin]);
 
   // Search Signal Hook
@@ -145,7 +164,7 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
     if (searchSignal && searchSignal.page === 'home' && searchSignal.itemId) {
       const itemId = searchSignal.itemId;
       const targetUpdate = dynamicUpdates.find(u => u.itemId === itemId || u.id.toString() === itemId.replace('news-', ''));
-      if (targetUpdate) setSelectedUpdate(targetUpdate);
+      if (targetUpdate) Promise.resolve().then(() => setSelectedUpdate(targetUpdate));
     }
   }, [searchSignal, dynamicUpdates]);
 
@@ -259,7 +278,7 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
             <div>
               <h3 className="text-2xl md:text-4xl font-black text-3d-heavy">Search Archives</h3>
               <p className="opacity-40 font-bold uppercase tracking-widest text-[10px] mt-2">
-                Filtering {filteredUpdates.length} records for "{globalSearchQuery}"
+                Filtering {filteredUpdates.length} records for &quot;{globalSearchQuery}&quot;
               </p>
             </div>
             <button onClick={() => setSearchSignal(null)} className="text-alaga-blue font-black uppercase text-[10px] md:text-xs hover:underline">Clear Search</button>

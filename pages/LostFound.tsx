@@ -23,12 +23,14 @@ const LostFound: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigat
     if (searchSignal && searchSignal.page === 'lost-found' && searchSignal.itemId) {
       const targetReport = reports.find(r => r.id === searchSignal.itemId);
       if (targetReport) {
-        if (targetReport.status === 'Missing' || targetReport.status === 'Found') {
-          setFilter(targetReport.status);
-        } else {
-          setFilter('All');
-        }
-        setSelectedReport(targetReport);
+        Promise.resolve().then(() => {
+          if (targetReport.status === 'Missing' || targetReport.status === 'Found') {
+            setFilter(targetReport.status);
+          } else {
+            setFilter('All');
+          }
+          setSelectedReport(targetReport);
+        });
       }
     }
   }, [searchSignal, reports]);

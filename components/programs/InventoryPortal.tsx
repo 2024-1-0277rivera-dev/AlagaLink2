@@ -4,19 +4,40 @@ import { useAppContext } from '../../context/AppContext';
 import { ProgramAvailment, UserProfile, LivelihoodProgram, MedicalService, AssistiveDevice } from '../../types';
 import ImageInput from '../shared/ImageInput';
 import FallbackImage from '../shared/FallbackImage';
+import type { Notification } from '../../context/AppContext';
+
+type ServiceItem = {
+  id: string;
+  name?: string;
+  title?: string;
+  overview?: string;
+  organizers?: string;
+  benefits?: string;
+  description?: string;
+  eligibility?: string;
+  schedule?: string;
+  modeOfReceiving?: string;
+  category?: string;
+  stockCount?: number;
+  photoUrl?: string;
+  photoAlt?: string;
+  isVisible?: boolean;
+  venue?: string;
+  skillSet?: string[];
+};
 
 interface InventoryPortalProps {
   type: 'Device' | 'Medical' | 'Livelihood';
   isAdmin: boolean;
   requests: ProgramAvailment[];
-  items: any[];
+  items: ServiceItem[];
   users: UserProfile[];
   onApply: (type: string, title: string, itemId: string) => void;
   onSelectRequest: (req: ProgramAvailment) => void;
-  onEditItem: (item: any) => void;
+  onEditItem: (item: ServiceItem) => void;
   onToggleVisibility: (id: string) => void;
   onRemoveItem: (id: string) => void;
-}
+} 
 
 const InventoryPortal: React.FC<InventoryPortalProps> = ({ 
   type, isAdmin, requests, items, users, onApply, onSelectRequest, onEditItem, onToggleVisibility, onRemoveItem 
@@ -29,7 +50,7 @@ const InventoryPortal: React.FC<InventoryPortalProps> = ({
   
   // Editor State
   const [isAddingNew, setIsAddingNew] = useState(false);
-  const [editingItemData, setEditingItemData] = useState<any>(null);
+  const [editingItemData, setEditingItemData] = useState<ServiceItem | null>(null);
 
   const getColors = () => {
     if (type === 'Device') return { primary: 'alaga-blue', icon: 'fa-wheelchair', bg: 'bg-alaga-blue/10', text: 'text-alaga-blue' };
@@ -61,12 +82,13 @@ const InventoryPortal: React.FC<InventoryPortalProps> = ({
     }
   };
 
-  const openEditor = (item: any = null) => {
+  const openEditor = (item: ServiceItem | null = null) => {
     setEditingItemData(item || { 
+      id: `temp-${Date.now()}`,
       name: '', title: '', overview: '', category: '', photoUrl: '', stockCount: 0, isVisible: true, organizers: '', schedule: '', benefits: '', venue: '' 
     });
     setIsAddingNew(true);
-  };
+  }; 
 
   const handleSaveItem = () => {
     if (!editingItemData.title && !editingItemData.name) {
@@ -200,8 +222,8 @@ const InventoryPortal: React.FC<InventoryPortalProps> = ({
                 const item = selectedLivelihood || selectedMedical || selectedDevice;
                 if (!item) return null;
                 const unreadRequestsForItem = requests.filter(r => r.requestedItemId === item.id && notifications.some(n => n.link && n.link.endsWith(r.id) && !n.isRead)).length;
-                const title = (item as any).title || (item as any).name;
-                const overview = item.overview || (item as any).description;
+                const title = item.title || item.name;
+                const overview = item.overview || item.description;
                 const skillLabel = type === 'Medical' ? 'Requirements & Focus' : type === 'Device' ? 'Eligibility & Requirements' : 'Skill Set Gained';
                 return (
                   <>
@@ -213,22 +235,22 @@ const InventoryPortal: React.FC<InventoryPortalProps> = ({
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
                         <div className="md:col-span-1 space-y-6">
                           <div className="w-full aspect-square bg-alaga-gray dark:bg-black/40 rounded-[20px] shadow-2xl overflow-hidden relative">
-                            <FallbackImage src={item.photoUrl} className="absolute inset-0 w-full h-full object-cover blur-xl opacity-20 scale-125" alt={(item as any).photoAlt || (item as any).name || (item as any).title} fallbackType={type} />
-                            <FallbackImage src={item.photoUrl} className="relative w-full h-full object-contain p-6" alt={(item as any).photoAlt || (item as any).name || (item as any).title} fallbackType={type} />
+                            <FallbackImage src={item.photoUrl} className="absolute inset-0 w-full h-full object-cover blur-xl opacity-20 scale-125" alt={item.photoAlt || item.name || item.title} fallbackType={type} />
+                            <FallbackImage src={item.photoUrl} className="relative w-full h-full object-contain p-6" alt={item.photoAlt || item.name || item.title} fallbackType={type} />
                           </div>
                           <div className="p-6 bg-alaga-gray dark:bg-alaga-navy/20 rounded-[20px] space-y-4 border border-gray-100 dark:border-white/5">
                             <div><p className="text-[9px] font-black uppercase opacity-40 mb-1 tracking-widest">Schedule</p><p className="font-bold text-sm">{item.schedule}</p></div>
                             <div><p className="text-[9px] font-black uppercase opacity-40 mb-1 tracking-widest">Location / Venue</p><p className="font-bold text-sm">{item.venue || 'Municipal Office'}</p></div>
                             <div><p className="text-[9px] font-black uppercase opacity-40 mb-1 tracking-widest">Sponsoring Organizers</p><p className="font-bold text-sm leading-tight">{item.organizers}</p></div>
-                            {(item as any).stockCount !== undefined && (
+                            {item.stockCount !== undefined && (
                               <div>
                                 <p className="text-[9px] font-black uppercase opacity-40 mb-1 tracking-widest">Inventory Status</p>
-                                <p className={`font-black text-sm ${(item as any).stockCount > 0 ? 'text-alaga-teal' : 'text-red-500'}`}>{(item as any).stockCount} Units Left</p>
+                                <p className={`font-black text-sm ${item.stockCount > 0 ? 'text-alaga-teal' : 'text-red-500'}`}>{item.stockCount} Units Left</p>
                               </div>
                             )}
                           </div>
                         </div>
-                        <div className="md:col-span-2 space-y-8"><section><h5 className="text-xs font-black uppercase tracking-widest text-alaga-blue mb-3">Item Overview</h5><p className="text-base leading-relaxed opacity-70">{overview}</p></section><div className="grid grid-cols-2 gap-8"><section><h5 className="text-xs font-black uppercase tracking-widest text-alaga-teal mb-3">{skillLabel}</h5><ul className="space-y-2">{((item as any).skillSet || [(item as any).eligibility] || []).map((s: string) => (<li key={s} className="text-sm font-bold flex items-center gap-2"><i className="fa-solid fa-check-circle text-alaga-teal opacity-50"></i> {s}</li>))}</ul></section><section><h5 className="text-xs font-black uppercase tracking-widest text-alaga-gold mb-3">Service Benefits</h5><p className="text-sm font-medium leading-relaxed opacity-80 italic">"{(item as any).benefits}"</p></section></div><section className="pt-8 border-t border-gray-100 dark:border-white/5"><h5 className="text-xs font-black uppercase tracking-widest text-alaga-blue mb-6 flex items-center justify-between"><span>Approved Recipients / Members</span><span className="text-[10px] bg-alaga-blue text-white px-3 py-1 rounded-full">{requests.filter(r => r.requestedItemId === item.id && (r.status === 'Approved' || r.status === 'Completed')).length} Members</span></h5><div className="grid grid-cols-1 sm:grid-cols-2 gap-4">{requests.filter(r => r.requestedItemId === item.id && (r.status === 'Approved' || r.status === 'Completed')).map(req => { const u = users.find(user => user.id === req.userId); return (<div key={req.id} className="p-4 bg-white dark:bg-alaga-navy/20 border border-gray-100 dark:border-white/5 rounded-2xl flex items-center gap-4 group/p"><img src={u?.photoUrl} className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm" /><div className="flex-1 min-w-0"><p className="text-sm font-black truncate">{u?.firstName} {u?.lastName}</p><p className="text-[9px] font-mono opacity-40 uppercase">{u?.id}</p></div><button onClick={() => handleCancelParticipation(req)} className="w-8 h-8 rounded-lg bg-red-500/5 text-red-500 opacity-0 group-hover/p:opacity-100 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center" title="Remove Recipient"><i className="fa-solid fa-user-minus text-xs"></i></button></div>); })}{requests.filter(r => r.requestedItemId === item.id && (r.status === 'Approved' || r.status === 'Completed')).length === 0 && (<div className="col-span-2 py-12 text-center border-2 border-dashed border-gray-100 dark:border-white/5 rounded-[20px] opacity-30 flex flex-col items-center"><i className="fa-solid fa-users-slash text-3xl mb-3"></i><p className="font-bold text-sm italic">No approved recipients listed yet.</p></div>)}</div></section></div>
+                        <div className="md:col-span-2 space-y-8"><section><h5 className="text-xs font-black uppercase tracking-widest text-alaga-blue mb-3">Item Overview</h5><p className="text-base leading-relaxed opacity-70">{overview}</p></section><div className="grid grid-cols-2 gap-8"><section><h5 className="text-xs font-black uppercase tracking-widest text-alaga-teal mb-3">{skillLabel}</h5><ul className="space-y-2">{((item.skillSet || [item.eligibility] || []) as string[]).map((s: string) => (<li key={s} className="text-sm font-bold flex items-center gap-2"><i className="fa-solid fa-check-circle text-alaga-teal opacity-50"></i> {s}</li>))}</ul></section><section><h5 className="text-xs font-black uppercase tracking-widest text-alaga-gold mb-3">Service Benefits</h5><p className="text-sm font-medium leading-relaxed opacity-80 italic">&quot;{item.benefits}&quot;</p> </section></div><section className="pt-8 border-t border-gray-100 dark:border-white/5"><h5 className="text-xs font-black uppercase tracking-widest text-alaga-blue mb-6 flex items-center justify-between"><span>Approved Recipients / Members</span><span className="text-[10px] bg-alaga-blue text-white px-3 py-1 rounded-full">{requests.filter(r => r.requestedItemId === item.id && (r.status === 'Approved' || r.status === 'Completed')).length} Members</span></h5><div className="grid grid-cols-1 sm:grid-cols-2 gap-4">{requests.filter(r => r.requestedItemId === item.id && (r.status === 'Approved' || r.status === 'Completed')).map(req => { const u = users.find(user => user.id === req.userId); return (<div key={req.id} className="p-4 bg-white dark:bg-alaga-navy/20 border border-gray-100 dark:border-white/5 rounded-2xl flex items-center gap-4 group/p"><img src={u?.photoUrl} alt={`${u?.firstName} ${u?.lastName}` || "User photo"} className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm" /><div className="flex-1 min-w-0"><p className="text-sm font-black truncate">{u?.firstName} {u?.lastName}</p><p className="text-[9px] font-mono opacity-40 uppercase">{u?.id}</p></div><button onClick={() => handleCancelParticipation(req)} className="w-8 h-8 rounded-lg bg-red-500/5 text-red-500 opacity-0 group-hover/p:opacity-100 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center" title="Remove Recipient"><i className="fa-solid fa-user-minus text-xs"></i></button></div>); })}{requests.filter(r => r.requestedItemId === item.id && (r.status === 'Approved' || r.status === 'Completed')).length === 0 && (<div className="col-span-2 py-12 text-center border-2 border-dashed border-gray-100 dark:border-white/5 rounded-[20px] opacity-30 flex flex-col items-center"><i className="fa-solid fa-users-slash text-3xl mb-3"></i><p className="font-bold text-sm italic">No approved recipients listed yet.</p></div>)}</div></section></div>
                       </div>
                     </div>
                   </>
@@ -251,12 +273,12 @@ const InventoryPortal: React.FC<InventoryPortalProps> = ({
 };
 
 interface InventoryCardProps {
-  item: any;
+  item: ServiceItem;
   type: 'Device' | 'Medical' | 'Livelihood';
   onApply: (type: string, title: string, itemId: string) => void;
   requests: ProgramAvailment[];
-  notifications: any[];
-}
+  notifications: Notification[];
+} 
 
 const InventoryCard: React.FC<InventoryCardProps> = ({ item, type, onApply, requests, notifications }) => {
   const [imageError, setImageError] = useState(false);

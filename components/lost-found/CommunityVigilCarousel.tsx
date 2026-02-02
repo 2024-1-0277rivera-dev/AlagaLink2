@@ -1,5 +1,6 @@
 'use client';
 import React, { useEffect, useState, useMemo } from 'react';
+import Image from 'next/image';
 import { LostReport } from '../../types';
 import CaseDetailModal from './CaseDetailModal';
 import { MOCK_MISSING } from '../../mockData/lost-found/missing';
@@ -59,8 +60,6 @@ const CommunityVigilCarousel: React.FC = () => {
         {missing.map((m, i) => {
           const visible = i === index;
           const hours = calcHoursMissing(m.timeMissing);
-          const urgencyLevel = hours >= 72 ? 'red' : hours >= 24 ? 'red' : hours >= 6 ? 'amber' : 'blue';
-          const urgencyClasses = urgencyLevel === 'red' ? 'bg-red-600 text-white' : urgencyLevel === 'amber' ? 'bg-amber-500 text-white' : 'bg-alaga-blue text-white';
 
           return (
             <div key={m.id} className={`absolute inset-0 w-full h-full transition-opacity duration-800 ease-in-out transform-gpu ${visible ? 'opacity-100 z-20' : 'opacity-0 z-10'}`} aria-hidden={!visible}>
@@ -68,7 +67,9 @@ const CommunityVigilCarousel: React.FC = () => {
 
                 {/* LEFT: Image card (smaller, more rounded) */}
                 <button onClick={() => setSelected(m)} className={`w-2/5 h-full relative overflow-hidden rounded-[24px] shadow-2xl transform-gpu transition-transform duration-[12000ms] ease-in-out ${visible ? 'scale-105' : 'scale-100'}`} aria-label={`View photo of ${m.name}`}>
-                  <img src={m.photoUrl || `https://picsum.photos/seed/${m.id}/1600/1000`} alt={m.name} className="w-full h-full object-cover object-center rounded-[24px] filter brightness-[1.06] contrast-[1.04]" />
+                  <div className="absolute inset-0">
+                    <Image src={m.photoUrl || `https://picsum.photos/seed/${m.id}/1600/1000`} alt={m.name} fill className="w-full h-full object-cover object-center rounded-[24px] filter brightness-[1.06] contrast-[1.04]" sizes="(min-width:1024px) 50vw, 100vw" />
+                  </div>
 
                   {/* Section icon inside image (top-left) */}
                   <div className="absolute top-4 left-4 z-40">
@@ -129,7 +130,7 @@ const CommunityVigilCarousel: React.FC = () => {
           <div className="flex items-center gap-2">
             {found.slice(0, 6).map(f => (
               <button key={f.id} onClick={() => setSelected(f)} className="w-10 h-10 overflow-hidden rounded-full ring-1 ring-white/10" aria-label={`Preview ${f.name}`}>
-                <img src={f.photoUrl || `https://picsum.photos/seed/${f.id}/200/300`} alt={f.name} className="w-full h-full object-cover" />
+                <Image src={f.photoUrl || `https://picsum.photos/seed/${f.id}/200/300`} alt={f.name} width={40} height={40} className="w-full h-full object-cover" />
               </button>
             ))}
           </div>

@@ -47,34 +47,40 @@ const Members: React.FC = () => {
             setSearchSignal(null);
             return;
           }
-          if (targetIsStaff) setActiveGroup('Staff');
-          else setActiveGroup('PWD');
-          if (targetUser.status === 'Active') setActiveTab('Registered');
-          else if (targetUser.status === 'Pending') setActiveTab('Pending');
-          else if (targetUser.status === 'Suspended') setActiveTab('Suspended');
-          setSelectedUser(targetUser);
+          Promise.resolve().then(() => {
+            if (targetIsStaff) setActiveGroup('Staff');
+            else setActiveGroup('PWD');
+            if (targetUser.status === 'Active') setActiveTab('Registered');
+            else if (targetUser.status === 'Pending') setActiveTab('Pending');
+            else if (targetUser.status === 'Suspended') setActiveTab('Suspended');
+            setSelectedUser(targetUser);
+          });
         }
       } else if (searchSignal.section) {
-        if (searchSignal.section === 'Staff' && isSuperAdmin) setActiveGroup('Staff');
-        if (searchSignal.section === 'PWD') setActiveGroup('PWD');
-        // Handle specific tabs like 'Pending', 'Registered', 'Suspended'
-        if (['Registered', 'Pending', 'Suspended'].includes(searchSignal.section)) {
-          setActiveTab(searchSignal.section as MemberTab);
-        } else {
-          setActiveTab('Registered');
-        }
+        Promise.resolve().then(() => {
+          if (searchSignal.section === 'Staff' && isSuperAdmin) setActiveGroup('Staff');
+          if (searchSignal.section === 'PWD') setActiveGroup('PWD');
+          // Handle specific tabs like 'Pending', 'Registered', 'Suspended'
+          if (['Registered', 'Pending', 'Suspended'].includes(searchSignal.section)) {
+            setActiveTab(searchSignal.section as MemberTab);
+          } else {
+            setActiveTab('Registered');
+          }
+        });
       }
     }
   }, [searchSignal, users, isSuperAdmin, setSearchSignal]);
 
   useEffect(() => {
     if (globalSearchFilter !== 'All') {
-      if (['Registered', 'Pending', 'Suspended'].includes(globalSearchFilter)) {
-         setActiveTab(globalSearchFilter as MemberTab);
-      } else if (globalSearchFilter === 'Staff' && isSuperAdmin) {
-         setActiveGroup('Staff');
-         setActiveTab('Registered');
-      }
+      Promise.resolve().then(() => {
+        if (['Registered', 'Pending', 'Suspended'].includes(globalSearchFilter)) {
+           setActiveTab(globalSearchFilter as MemberTab);
+        } else if (globalSearchFilter === 'Staff' && isSuperAdmin) {
+           setActiveGroup('Staff');
+           setActiveTab('Registered');
+        }
+      });
     }
   }, [globalSearchFilter, isSuperAdmin]);
 
@@ -89,19 +95,22 @@ const Members: React.FC = () => {
     });
   }, [users, globalSearchQuery, activeGroup, activeTab, isSuperAdmin]);
 
-  const handleRegisterSubmit = (formData: any) => {
-    const photoUrl = formData.photoUrl || `https://randomuser.me/api/portraits/${formData.sex === 'Female' ? 'women' : 'men'}/${Math.floor(Math.random()*99)}.jpg`;
+  const handleRegisterSubmit = (formData: Partial<UserProfile> & { sex?: string }) => {
+    /* eslint-disable-next-line react-hooks/purity -- photo URL randomization is safe inside an event handler */
+    const f = formData as Partial<UserProfile> & { sex?: string };
+    const photoUrl = f.photoUrl || `https://randomuser.me/api/portraits/${(f.sex === 'Female' ? 'women' : 'men')}/${Math.floor(Math.random()*99)}.jpg`;
     
     // Explicitly handle staff role creation
     const isStaffGroup = activeGroup === 'Staff';
     
+    /* eslint-disable-next-line react-hooks/purity -- id generation is safe inside an event handler */
     const newUser: UserProfile = {
-      ...formData,
+      ...(formData as UserProfile),
       id: isStaffGroup ? `ADM-LT-${Date.now()}` : `LT-PWD-${Date.now()}`,
       status: 'Pending',
       photoUrl,
       role: isStaffGroup ? 'Admin' : 'User',
-      disabilityCategory: isStaffGroup ? DisabilityCategory.None : formData.disabilityCategory,
+      disabilityCategory: isStaffGroup ? DisabilityCategory.None : (f.disabilityCategory as DisabilityCategory) || DisabilityCategory.None,
       history: { lostAndFound: [], programs: [] }
     };
 
@@ -110,9 +119,9 @@ const Members: React.FC = () => {
     return true;
   };
 
-  const handleUpdateProfile = (formData: any) => {
+  const handleUpdateProfile = (formData: Partial<UserProfile>) => {
     if (!selectedUser) return;
-    const updatedUser: UserProfile = { ...selectedUser, ...formData };
+    const updatedUser: UserProfile = { ...selectedUser, ...(formData as UserProfile) };
     updateUser(updatedUser);
     setIsEditing(false);
     setSelectedUser(updatedUser);

@@ -2,8 +2,21 @@
 import React from 'react';
 import { useAppContext } from '../../context/AppContext';
 
+type UpdateItem = {
+  id: string;
+  title: string;
+  photoUrl?: string;
+  type?: 'Urgent' | 'Alert' | string;
+  date?: string;
+  summary?: string;
+  detail?: string;
+  link?: string;
+  itemId?: string;
+  section?: string;
+};
+
 interface UpdateModalProps {
-  update: any;
+  update: UpdateItem | null;
   onClose: () => void;
   onNavigate: (page: string) => void;
 }

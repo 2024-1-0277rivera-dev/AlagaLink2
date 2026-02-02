@@ -1,17 +1,17 @@
 import React, { useState, useRef } from 'react';
 import { useAppContext } from '../../context/AppContext';
-import { DisabilityCategory } from '../../types';
+import { DisabilityCategory, AssistiveDevice, MedicalService, LivelihoodProgram, ProgramAvailment, UserProfile } from '../../types';
 import RegistrationWorkflow from '../members/RegistrationWorkflow';
+import { MOCK_DEVICES, MOCK_MEDICAL, MOCK_LIVELIHOODS } from '../../mockData';
 
 const LandingPage: React.FC = () => {
-  const { login, loginWithPassword, users, addUser, loginById, addProgramRequest, searchSignal, setSearchSignal, notifications, currentUser } = useAppContext();
+  const { loginWithPassword, addUser, loginById, addProgramRequest, searchSignal, setSearchSignal, notifications, currentUser } = useAppContext();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showSignupPopover, setShowSignupPopover] = useState(false);
   const [showLoginPopover, setShowLoginPopover] = useState(false);
   const [activeRegistration, setActiveRegistration] = useState<'User' | 'Staff' | null>(null);
   const [showPWDIDPopover, setShowPWDIDPopover] = useState(false);
-  const [error, setError] = useState('');
   const [loginError, setLoginError] = useState('');
 
   const programsRef = useRef<HTMLDivElement>(null);
@@ -20,18 +20,18 @@ const LandingPage: React.FC = () => {
   const [aboutService, setAboutService] = useState<{ title: string; description: string } | null>(null);
 
   // Services catalog for landing page preview
-  const { MOCK_DEVICES, MOCK_MEDICAL, MOCK_LIVELIHOODS } = require('../../mockData/index');
+  type ApplyTarget = { sentinelServiceId?: string; title?: string } | null;
   const [selectedService, setSelectedService] = useState<{ id: string; title: string; desc: string } | null>(null);
   const [showServicePopover, setShowServicePopover] = useState(false);
   const [showApplyPopover, setShowApplyPopover] = useState(false);
-  const [applyTarget, setApplyTarget] = useState<any>(null);
+  const [applyTarget, setApplyTarget] = useState<ApplyTarget>(null);
 
   const openService = (id: string, title: string, desc: string) => {
     setSelectedService({ id, title, desc });
     setShowServicePopover(true);
   };
 
-  const handleApplyAttempt = (item?: any) => {
+  const handleApplyAttempt = (item?: { id?: string; title?: string } | null) => {
     if (!item && selectedService?.id) {
       setApplyTarget({ sentinelServiceId: selectedService.id, title: selectedService.title });
     } else {
@@ -57,16 +57,34 @@ const LandingPage: React.FC = () => {
     }
   };
 
-  const handleRegister = (formData: any) => {
+  const handleRegister = (formData: Partial<UserProfile>) => {
     const newId = activeRegistration === 'Staff' ? `ADM-LT-${Date.now()}` : `LT-PWD-${Date.now()}`;
-    const newUser = {
-      ...formData,
+    const newUser: UserProfile = {
       id: newId,
+      email: (formData.email as string) || `${newId}@local`,
+      role: activeRegistration === 'Staff' ? 'Admin' : 'User',
+      firstName: (formData.firstName as string) || 'First',
+      lastName: (formData.lastName as string) || 'Last',
+      address: (formData.address as string) || '',
+      birthDate: (formData.birthDate as string) || new Date().toISOString(),
+      provincialAddress: (formData.provincialAddress as string) || '',
+      civilStatus: (formData.civilStatus as string) || 'Single',
+      occupation: (formData.occupation as string) || '',
+      sex: (formData.sex as 'Male' | 'Female' | 'Other') || 'Other',
+      bloodType: (formData.bloodType as string) || 'N/A',
+      age: (formData.age as number) || 0,
+      contactNumber: (formData.contactNumber as string) || '',
+      disabilityCategory: (formData.disabilityCategory as DisabilityCategory) || DisabilityCategory.None,
+      familyComposition: (formData.familyComposition as unknown as import('../../types').FamilyMember[]) || [],
+      emergencyContact: (formData.emergencyContact as unknown as { name: string; relation: string; contact: string; }) || { name: '', relation: '', contact: '' },
+      registrantType: activeRegistration === 'Staff' ? 'PDAO Staff' : 'Self',
       status: 'Pending',
+      photoUrl: (formData.photoUrl as string) || '',
+      customData: (formData.customData as Record<string, string>) || {},
       history: { lostAndFound: [], programs: [] }
     };
     addUser(newUser);
-    const newReq = {
+    const newReq: ProgramAvailment = {
       id: `req-${Date.now()}`,
       userId: newId,
       programType: 'ID',
@@ -75,7 +93,7 @@ const LandingPage: React.FC = () => {
       dateApplied: new Date().toISOString(),
       details: ''
     };
-    addProgramRequest(newReq as any);
+    addProgramRequest(newReq);
     loginById(newId);
     return true;
   };
@@ -99,7 +117,6 @@ const LandingPage: React.FC = () => {
     setAboutService({ title, description });
   };
 
-  const programsNotifCount = notifications.filter(n => n.link && n.link.startsWith('programs')).length;
   const idNotif = notifications.some(n => n.programType === 'ID' || (n.link && n.link.startsWith('programs:ID')));
   const assistiveNotif = notifications.some(n => n.programType === 'Device' || (n.link && n.link.includes('requests') && n.programType === 'Device'));
   const medicalNotif = notifications.some(n => n.programType === 'Medical' || (n.link && n.link.includes('requests') && n.programType === 'Medical'));
@@ -225,6 +242,7 @@ const LandingPage: React.FC = () => {
               {/* Assistive Devices Card */}
               <div className="inflated-card bg-white dark:bg-alaga-charcoal rounded-[24px] overflow-hidden flex flex-col group transition-transform duration-300 ease-out transform-gpu hover:scale-105 hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-alaga-blue/10 h-full min-h-[260px] p-0">
                 <div className="relative h-44 overflow-hidden cursor-pointer bg-gradient-to-br from-alaga-blue/10 to-alaga-blue/5">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src="/images/programs/standard wheelchair.jpg" alt="Wheelchairs and assistive devices" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 rounded-t-lg" />
                 </div>
                 <div className="p-6 space-y-3 flex flex-col flex-1">
@@ -301,6 +319,7 @@ const LandingPage: React.FC = () => {
               <div className="absolute inset-0 bg-red-500/10 rounded-[32px] blur-3xl group-hover:bg-red-500/20 transition-all"></div>
               <div className="relative bg-white dark:bg-alaga-charcoal p-8 rounded-[32px] border-2 border-white dark:border-white/5 shadow-xl inflated-card">
                  <div className="relative w-full h-64 rounded-[24px] overflow-hidden mb-6 bg-gradient-to-br from-red-500/10 to-red-500/5">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src="/images/lost-found/community-safety.svg" alt="Community safety and alert" className="w-full h-full object-cover" />
                  </div>
                  <div className="space-y-3">
@@ -409,43 +428,46 @@ const LandingPage: React.FC = () => {
             </div>
 
             <div className="mt-6 space-y-4">
-              {selectedService.id === 'devices' && MOCK_DEVICES.map((d: any) => (
+              {selectedService.id === 'devices' && MOCK_DEVICES.map((d: AssistiveDevice) => (
                 <div key={d.id} className="flex items-center gap-4 p-3 rounded-lg border border-gray-100">
-                  <img src={d.photo} alt={d.photoAlt || d.title} className="w-16 h-12 object-cover rounded" />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={d.photoUrl || ''} alt={d.name} className="w-16 h-12 object-cover rounded" />
                   <div className="flex-1">
-                    <div className="font-black">{d.title}</div>
-                    <div className="text-xs opacity-60">{d.desc || d.description || ''}</div>
+                    <div className="font-black">{d.name}</div>
+                    <div className="text-xs opacity-60">{d.description || d.overview || ''}</div>
                   </div>
-                  <button onClick={() => { if (currentUser) { const req = { id: `req-${Date.now()}`, userId: currentUser.id, programType: 'Device', title: d.title || 'Device Request', status: 'Pending', dateApplied: new Date().toISOString(), details: '', requestedItemId: d.id } as any; addProgramRequest(req); setShowServicePopover(false); } else { handleApplyAttempt(d); } }} className="px-3 py-2 bg-alaga-blue text-white rounded text-xs font-black">Request</button>
+                  <button onClick={() => { if (currentUser) { const req: ProgramAvailment = { id: `req-${Date.now()}`, userId: currentUser.id, programType: 'Device', title: d.name || 'Device Request', status: 'Pending', dateApplied: new Date().toISOString(), details: '', requestedItemId: d.id }; addProgramRequest(req); setShowServicePopover(false); } else { handleApplyAttempt({ id: d.id, title: d.name }); } }} className="px-3 py-2 bg-alaga-blue text-white rounded text-xs font-black">Request</button>
                 </div>
               ))}
 
-              {selectedService.id === 'medical' && MOCK_MEDICAL.map((m: any) => (
+              {selectedService.id === 'medical' && MOCK_MEDICAL.map((m: MedicalService) => (
                 <div key={m.id} className="flex items-center gap-4 p-3 rounded-lg border border-gray-100">
-                  <img src={m.photo} alt={m.photoAlt || m.title} className="w-16 h-12 object-cover rounded" />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={m.photoUrl || ''} alt={m.name} className="w-16 h-12 object-cover rounded" />
                   <div className="flex-1">
-                    <div className="font-black">{m.title}</div>
-                    <div className="text-xs opacity-60">{m.desc || m.description || ''}</div>
+                    <div className="font-black">{m.name}</div>
+                    <div className="text-xs opacity-60">{m.assistanceDetail || m.overview || ''}</div>
                   </div>
-                  <button onClick={() => { if (currentUser) { const req = { id: `req-${Date.now()}`, userId: currentUser.id, programType: 'Medical', title: m.title || 'Medical Request', status: 'Pending', dateApplied: new Date().toISOString(), details: '', requestedItemId: m.id } as any; addProgramRequest(req); setShowServicePopover(false); } else { handleApplyAttempt(m); } }} className="px-3 py-2 bg-red-500 text-white rounded text-xs font-black">Request</button>
+                  <button onClick={() => { if (currentUser) { const req: ProgramAvailment = { id: `req-${Date.now()}`, userId: currentUser.id, programType: 'Medical', title: m.name || 'Medical Request', status: 'Pending', dateApplied: new Date().toISOString(), details: '', requestedItemId: m.id }; addProgramRequest(req); setShowServicePopover(false); } else { handleApplyAttempt({ id: m.id, title: m.name }); } }} className="px-3 py-2 bg-red-500 text-white rounded text-xs font-black">Request</button>
                 </div>
               ))}
 
-              {selectedService.id === 'livelihood' && MOCK_LIVELIHOODS.map((l: any) => (
+              {selectedService.id === 'livelihood' && MOCK_LIVELIHOODS.map((l: LivelihoodProgram) => (
                 <div key={l.id} className="flex items-center gap-4 p-3 rounded-lg border border-gray-100">
-                  <img src={l.photo} alt={l.photoAlt || l.title} className="w-16 h-12 object-cover rounded" />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={l.photoUrl || ''} alt={l.photoAlt || l.title} className="w-16 h-12 object-cover rounded" />
                   <div className="flex-1">
                     <div className="font-black">{l.title}</div>
-                    <div className="text-xs opacity-60">{l.desc || l.description || ''}</div>
+                    <div className="text-xs opacity-60">{(l as unknown as { desc?: string; description?: string }).desc || (l as unknown as { desc?: string; description?: string }).description || l.overview || ''}</div>
                   </div>
-                  <button onClick={() => { if (currentUser) { const req = { id: `req-${Date.now()}`, userId: currentUser.id, programType: 'Livelihood', title: l.title || 'Livelihood Request', status: 'Pending', dateApplied: new Date().toISOString(), details: '', requestedItemId: l.id } as any; addProgramRequest(req); setShowServicePopover(false); } else { handleApplyAttempt(l); } }} className="px-3 py-2 bg-alaga-teal text-white rounded text-xs font-black">Request</button>
+                  <button onClick={() => { if (currentUser) { const req: ProgramAvailment = { id: `req-${Date.now()}`, userId: currentUser.id, programType: 'Livelihood', title: l.title || 'Livelihood Request', status: 'Pending', dateApplied: new Date().toISOString(), details: '', requestedItemId: l.id }; addProgramRequest(req); setShowServicePopover(false); } else { handleApplyAttempt({ id: l.id, title: l.title }); } }} className="px-3 py-2 bg-alaga-teal text-white rounded text-xs font-black">Request</button>
                 </div>
               ))}
 
               {selectedService.id === 'philhealth' && (
                 <div className="p-4 rounded-lg border border-gray-100">
                   <p className="opacity-60 text-sm">Sponsored PhilHealth enrollment and benefit assistance. To apply, please register or log in and follow the PhilHealth enrollment workflow.</p>
-              <div className="mt-6 flex items-center gap-3"><button onClick={() => { if (currentUser) { const req = { id: `req-${Date.now()}`, userId: currentUser.id, programType: 'PhilHealth', title: 'PhilHealth Enrollment', status: 'Pending', dateApplied: new Date().toISOString(), details: '' } as any; addProgramRequest(req); setShowServicePopover(false); } else { handleApplyAttempt(null); } }} className="px-4 py-2 bg-alaga-gold text-alaga-navy rounded-xl font-black text-xs">Request Enrollment</button><button onClick={() => setShowServicePopover(false)} className="px-4 py-2 border border-gray-200 rounded-xl text-xs">Close</button></div>
+              <div className="mt-6 flex items-center gap-3"><button onClick={() => { if (currentUser) { const req: ProgramAvailment = { id: `req-${Date.now()}`, userId: currentUser.id, programType: 'PhilHealth', title: 'PhilHealth Enrollment', status: 'Pending', dateApplied: new Date().toISOString(), details: '' }; addProgramRequest(req); setShowServicePopover(false); } else { handleApplyAttempt(null); } }} className="px-4 py-2 bg-alaga-gold text-alaga-navy rounded-xl font-black text-xs">Request Enrollment</button><button onClick={() => setShowServicePopover(false)} className="px-4 py-2 border border-gray-200 rounded-xl text-xs">Close</button></div>
                 </div>
               )}
 
@@ -464,7 +486,7 @@ const LandingPage: React.FC = () => {
                         <div className="font-black">New PWD ID Issuance</div>
                         <div className="text-xs opacity-60">Apply for your first official Municipal PWD ID.</div>
                       </div>
-                      <button onClick={() => { if (currentUser) { const req = { id: `req-${Date.now()}`, userId: currentUser.id, programType: 'ID', title: 'New PWD ID Issuance', status: 'Pending', dateApplied: new Date().toISOString(), details: '' } as any; addProgramRequest(req); setShowServicePopover(false); } else { handleApplyAttempt({ title: 'New PWD ID Issuance' }); } }} className="px-3 py-2 bg-alaga-blue text-white rounded text-xs font-black">Apply</button>
+                      <button onClick={() => { if (currentUser) { const req: ProgramAvailment = { id: `req-${Date.now()}`, userId: currentUser.id, programType: 'ID', title: 'New PWD ID Issuance', status: 'Pending', dateApplied: new Date().toISOString(), details: '' }; addProgramRequest(req); setShowServicePopover(false); } else { handleApplyAttempt({ title: 'New PWD ID Issuance' }); } }} className="px-3 py-2 bg-alaga-blue text-white rounded text-xs font-black">Apply</button>
                     </div>
                   </div>
                 </div>
@@ -569,7 +591,7 @@ const LandingPage: React.FC = () => {
                  </form>
 
                  <div className="text-center text-xs opacity-60 font-medium">
-                    Don't have an account? 
+                    Don&apos;t have an account? 
                     <button 
                       onClick={() => {
                         setShowLoginPopover(false);

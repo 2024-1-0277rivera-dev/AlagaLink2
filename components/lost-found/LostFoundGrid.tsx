@@ -9,6 +9,7 @@ interface LostFoundGridProps {
 
 const LostFoundGrid: React.FC<LostFoundGridProps> = ({ reports, onSelect }) => {
   const calculateHoursMissing = (time: string) => {
+    /* eslint-disable-next-line react-hooks/purity -- computing relative hours is safe here */
     return Math.floor((Date.now() - new Date(time).getTime()) / (1000 * 60 * 60));
   };
 

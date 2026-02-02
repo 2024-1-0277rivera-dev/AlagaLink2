@@ -6,8 +6,8 @@ import ImageInput from '../shared/ImageInput';
 import { MUNICIPAL_ASSETS } from '../../mockData/assets';
 
 interface RegistrationWorkflowProps {
-  customSections: any[];
-  onSubmit: (data: any, family: FamilyMember[]) => boolean | Promise<boolean | { success: boolean; message?: string } | void>;
+  customSections: Array<Record<string, unknown>>;
+  onSubmit: (data: Partial<UserProfile>, family: FamilyMember[]) => boolean | Promise<boolean | { success: boolean; message?: string } | void>;
   onCancel?: () => void;
   initialData?: Partial<UserProfile>;
   isEditMode?: boolean;
@@ -92,13 +92,16 @@ const RegistrationWorkflow: React.FC<RegistrationWorkflowProps> = ({
 
   useEffect(() => {
     if (initialData) {
-      setFormData(prev => ({ ...prev, ...initialData }));
-      if (initialData.professionalQualifications) {
-        setQualifications(initialData.professionalQualifications);
-      }
-      setFamilyMembers(initialData.familyComposition || []);
-      setEmergencyContact(initialData.emergencyContact || { name: '', relation: '', contact: '' });
-      if (initialData.registrantType) setStep('Form');
+      // Defer state updates to avoid synchronous setState in effects
+      Promise.resolve().then(() => {
+        setFormData(prev => ({ ...prev, ...initialData }));
+        if (initialData.professionalQualifications) {
+          setQualifications(initialData.professionalQualifications);
+        }
+        setFamilyMembers(initialData.familyComposition || []);
+        setEmergencyContact(initialData.emergencyContact || { name: '', relation: '', contact: '' });
+        if (initialData.registrantType) setStep('Form');
+      });
     }
   }, [initialData]);
 
@@ -123,11 +126,13 @@ const RegistrationWorkflow: React.FC<RegistrationWorkflowProps> = ({
     setStep('Form');
   };
 
+  const familyCounterRef = React.useRef(0);
   const handleAddFamily = () => {
-    setFamilyMembers([...familyMembers, { id: `fam-${Date.now()}`, fullName: '', relation: '', age: 0, sex: 'Male' }]);
+    const id = `fam-${++familyCounterRef.current}`;
+    setFamilyMembers(prev => [...prev, { id, fullName: '', relation: '', age: 0, sex: 'Male' }]);
   };
 
-  const updateFamilyMember = (id: string, field: keyof FamilyMember, value: any) => {
+  const updateFamilyMember = (id: string, field: keyof FamilyMember, value: string | number | boolean) => {
     setFamilyMembers(prev => prev.map(m => m.id === id ? { ...m, [field]: value } : m));
   };
 
@@ -163,8 +168,8 @@ const RegistrationWorkflow: React.FC<RegistrationWorkflowProps> = ({
       } else if (typeof result === 'boolean') {
         success = result;
       } else if (typeof result === 'object') {
-        success = Boolean(result.success ?? false);
-        message = (result as any).message || '';
+        success = Boolean((result as { success?: boolean }).success ?? false);
+        message = (result as { message?: string }).message || '';
       }
 
       if (success) {
@@ -180,9 +185,10 @@ const RegistrationWorkflow: React.FC<RegistrationWorkflowProps> = ({
         setSubmissionStatus('error');
         setSubmissionMessage(message || 'Registration failed. Please try again.');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = (err as Error)?.message || 'Registration failed. Please try again.';
       setSubmissionStatus('error');
-      setSubmissionMessage(err?.message || 'Registration failed. Please try again.');
+      setSubmissionMessage(message);
     }
   };
 
@@ -267,7 +273,7 @@ const RegistrationWorkflow: React.FC<RegistrationWorkflowProps> = ({
             </div>
             <div className="space-y-2">
               <label className="text-[10px] font-black uppercase opacity-40 tracking-widest">Sex</label>
-              <select value={formData.sex} onChange={e => setFormData({...formData, sex: e.target.value as any})} className={`w-full p-4 rounded-2xl bg-alaga-gray dark:bg-alaga-navy/30 border-none outline-none focus:ring-2 font-bold appearance-none ${isStaff ? 'ring-alaga-blue/30' : 'ring-alaga-teal/30'}`}><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select>
+              <select value={formData.sex} onChange={e => setFormData({...formData, sex: e.target.value as 'Male' | 'Female' | 'Other'})} className={`w-full p-4 rounded-2xl bg-alaga-gray dark:bg-alaga-navy/30 border-none outline-none focus:ring-2 font-bold appearance-none ${isStaff ? 'ring-alaga-blue/30' : 'ring-alaga-teal/30'}`}><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select>
             </div>
             <div className="space-y-2">
               <label className="text-[10px] font-black uppercase opacity-40 tracking-widest">Blood Type</label>
@@ -329,7 +335,7 @@ const RegistrationWorkflow: React.FC<RegistrationWorkflowProps> = ({
                     <div className="absolute top-full mt-4 left-0 w-full bg-white dark:bg-alaga-charcoal shadow-2xl rounded-[16px] p-8 z-[100] border border-gray-100 dark:border-white/10 animate-in zoom-in-95 duration-200">
                       <div className="relative mb-6"><i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 opacity-30"></i><input autoFocus placeholder="Search 14 IDEA categories..." className="w-full pl-12 pr-4 py-4 bg-alaga-gray dark:bg-alaga-navy/40 rounded-2xl border-none outline-none focus:ring-2 ring-purple-500/30" value={pickerSearch} onChange={e => setPickerSearch(e.target.value)} /></div>
                       <div className="grid grid-cols-1 gap-2 max-h-[300px] overflow-y-auto no-scrollbar">
-                        {filteredCategories.map(c => (<div key={c} onClick={() => { setFormData({...formData, disabilityCategory: c as any}); setShowPicker(false); }} className={`p-4 rounded-2xl cursor-pointer text-sm font-bold flex items-center justify-between transition-all ${formData.disabilityCategory === c ? 'bg-purple-500 text-white' : 'hover:bg-purple-500/10'}`}>{c}{formData.disabilityCategory === c && <i className="fa-solid fa-check"></i>}</div>))}
+                        {filteredCategories.map(c => (<div key={c} onClick={() => { setFormData({...formData, disabilityCategory: c as DisabilityCategory}); setShowPicker(false); }} className={`p-4 rounded-2xl cursor-pointer text-sm font-bold flex items-center justify-between transition-all ${formData.disabilityCategory === c ? 'bg-purple-500 text-white' : 'hover:bg-purple-500/10'}`}>{c}{formData.disabilityCategory === c && <i className="fa-solid fa-check"></i>}</div>))}
                       </div>
                     </div>
                   )}
@@ -363,7 +369,7 @@ const RegistrationWorkflow: React.FC<RegistrationWorkflowProps> = ({
                       <div className="space-y-1"><label className="text-[10px] font-black uppercase opacity-40">Full Name</label><input value={member.fullName} onChange={e => updateFamilyMember(member.id, 'fullName', e.target.value)} className="w-full p-3 rounded-xl bg-white dark:bg-alaga-charcoal border-none outline-none font-bold" /></div>
                       <div className="space-y-1"><label className="text-[10px] font-black uppercase opacity-40">Relation</label><input value={member.relation} onChange={e => updateFamilyMember(member.id, 'relation', e.target.value)} className="w-full p-3 rounded-xl bg-white dark:bg-alaga-charcoal border-none outline-none font-bold" /></div>
                       <div className="space-y-1"><label className="text-[10px] font-black uppercase opacity-40">Age</label><input type="number" value={member.age} onChange={e => updateFamilyMember(member.id, 'age', parseInt(e.target.value))} className="w-full p-3 rounded-xl bg-white dark:bg-alaga-charcoal border-none outline-none font-bold" /></div>
-                      <div className="space-y-1"><label className="text-[10px] font-black uppercase opacity-40">Sex</label><select value={member.sex} onChange={e => updateFamilyMember(member.id, 'sex', e.target.value as any)} className="w-full p-3 rounded-xl bg-white dark:bg-alaga-charcoal border-none outline-none font-bold"><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select></div>
+                      <div className="space-y-1"><label className="text-[10px] font-black uppercase opacity-40">Sex</label><select value={member.sex} onChange={e => updateFamilyMember(member.id, 'sex', e.target.value as 'Male' | 'Female' | 'Other')} className="w-full p-3 rounded-xl bg-white dark:bg-alaga-charcoal border-none outline-none font-bold"><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select></div>
                     </div>
                   ))}
                 </div>
