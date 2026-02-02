@@ -55,17 +55,38 @@ const ImageInput: React.FC<ImageInputProps> = ({
     }
   };
 
-  const testImageUrl = (testUrl: string) => {
+  const testImageUrl = async (testUrl: string) => {
     setIsTesting(true);
     setImageError('');
-    return new Promise<boolean>((resolve) => {
+
+    // If we're testing our own proxy endpoint, prefer a HEAD request to validate content-type quickly
+    try {
+      if (testUrl.startsWith('/api/')) {
+        const r = await fetch(testUrl, { method: 'HEAD' });
+        const ct = r.headers.get('content-type') || '';
+        const ok = r.ok && ct.startsWith('image/');
+        if (!ok) {
+          setIsTesting(false);
+          setImageError('Proxy responded but did not return an image.');
+          return false;
+        }
+        setIsTesting(false);
+        setImageError('');
+        return true;
+      }
+    } catch (err) {
+      // head request failed, fall back to image test
+    }
+
+    return await new Promise<boolean>((resolve) => {
+      let settled = false;
       const img = new Image();
       img.crossOrigin = 'anonymous';
-      img.onload = () => { setIsTesting(false); setImageError(''); resolve(true); };
-      img.onerror = () => { setIsTesting(false); setImageError('Unable to load image from the provided URL (CORS or invalid asset).'); resolve(false); };
+      img.onload = () => { if (!settled) { settled = true; setIsTesting(false); setImageError(''); resolve(true); } };
+      img.onerror = () => { if (!settled) { settled = true; setIsTesting(false); setImageError('Unable to load image from the provided URL (CORS or invalid asset).'); resolve(false); } };
       img.src = testUrl;
-      // In some cases, the src assignment is enough to trigger load/error
-      setTimeout(() => { if (isTesting) { setIsTesting(false); resolve(false); } }, 4000);
+      // Fail-safe timeout
+      setTimeout(() => { if (!settled) { settled = true; setIsTesting(false); setImageError('Image load timed out'); resolve(false); } }, 6000);
     });
   };
 
